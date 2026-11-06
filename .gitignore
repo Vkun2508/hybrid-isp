@@ -14,3 +14,6 @@ web/dist/
 kaggle.json
 .env
 .cache/
+
+# eval report is generated with the real Team ID
+eval_P2_TeamID.md

@@ -88,6 +88,16 @@ export function Results() {
         </section>
       )}
 
+      {b?.status === "provisional" && (
+        <section className="card pending" role="note">
+          <span className="pill warning" style={{ justifySelf: "start" }}><span className="dot" /> Provisional numbers</span>
+          <p className="secondary">
+            Measured with the classical stand-in in place of the trained network ({b.model?.variant}). The learned core is
+            still training; these tables are recomputed on the same test scenes when it finishes.
+          </p>
+        </section>
+      )}
+
       {b?.quality && (
         <section className="card">
           <div className="card-head"><h2>Quality</h2><p>Mean over the test images · best in bold</p></div>
