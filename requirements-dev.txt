@@ -11,3 +11,4 @@ matplotlib
 tqdm
 torchinfo
 psutil
+modal            # hosting (modal_app.py)
