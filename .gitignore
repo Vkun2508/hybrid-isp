@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+graphify-out/
+# training scratch (data never goes in git)
+sidd_cc/
+training/sidd_cc/
+exported_model/
+*.zip
+# frontend
+web/node_modules/
+web/dist/
+# secrets
+kaggle.json
+.env
