@@ -41,6 +41,8 @@ export interface ProcessResponse {
   timings: Record<string, number>;
 }
 
+type Cell = { psnr: number; delta_e: number };
+
 // results/benchmarks.json, written by eval/*.py (the Results tab renders whatever subset exists)
 export interface Benchmarks {
   status: "final" | "provisional" | "pending";
@@ -54,6 +56,20 @@ export interface Benchmarks {
   ablation?: { variant: string; psnr: number; ssim: number; delta_e: number; note?: string }[];
   failures?: { title: string; description: string; image_url?: string }[];
   meta?: { subset_n: number; ablation_conditions: string[]; robustness_note: string };
+  router?: {
+    conditions: string[]; n_images: number;
+    modes: { mode: string; psnr: number; delta_e: number; latency_ms: number; network_share: number }[];
+    paths_by_iso_as_captured: Record<string, Record<string, number>>;
+  };
+  breakdown?: Record<"by_phone" | "by_iso", { group: string; n: number; input: Cell; traditional: Cell; learned: Cell; hybrid: Cell }[]>;
+  efficiency_sweep?: Record<string, number | string>[];
+  tiling?: { image: string; note?: string; variants: { variant: string; latency_ms: number; psnr_vs_single_pass: number; interior_max_abs_diff?: number; interior_psnr?: number }[] };
+  phone_raw?: {
+    file: string; preview?: string; passed: boolean;
+    libraw?: { raw_type: string; cfa: string; black_level_per_channel: number[]; white_level: number };
+    route?: { path: string; wb: string };
+    checks?: { colour_vs_camera_wb_deg: number };
+  }[];
 }
 
 export class ApiError extends Error {

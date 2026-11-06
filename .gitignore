@@ -21,3 +21,6 @@ eval_P2_TeamID.md
 # private, kept locally only
 CONTEXT.md
 docs/brief/
+
+# Claude Code session files
+.claude/

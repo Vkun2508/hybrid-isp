@@ -221,6 +221,106 @@ export function Results() {
         </section>
       )}
 
+      {b?.router && (
+        <section className="card">
+          <div className="card-head">
+            <h2>Does the router earn its keep?</h2>
+            <p>{b.router.n_images} test images × {b.router.conditions.join(", ")}</p>
+          </div>
+          <table className="table">
+            <thead><tr><th>Mode</th><th className="num">PSNR ↑</th><th className="num">ΔE ↓</th><th className="num">Mean time</th><th className="num">Through the network</th></tr></thead>
+            <tbody>
+              {b.router.modes.map((m) => (
+                <tr key={m.mode} className={m.mode.startsWith("Adaptive") ? "hybrid" : undefined}>
+                  <td>{m.mode}</td>
+                  <td className="num">{fixed(m.psnr, 2)}<span className="unit">dB</span></td>
+                  <td className="num">{fixed(m.delta_e, 2)}</td>
+                  <td className="num">{Math.round(m.latency_ms)}<span className="unit">ms</span></td>
+                  <td className="num">{Math.round(m.network_share * 100)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="table-note">
+            Paths chosen as captured:{" "}
+            {Object.entries(b.router.paths_by_iso_as_captured).map(([k, v]) =>
+              `${k}: ${Object.entries(v).map(([p, n]) => `${n} ${p.replace("_", " + ")}`).join(", ")}`).join(" · ")}
+          </p>
+        </section>
+      )}
+
+      {b?.breakdown && (
+        <section className="card">
+          <div className="card-head"><h2>Per phone</h2><p>As captured · PSNR dB / ΔE</p></div>
+          <table className="table">
+            <thead><tr><th>Phone</th><th className="num">Images</th><th className="num">Traditional</th><th className="num">Learned only</th><th className="num">Hybrid</th></tr></thead>
+            <tbody>
+              {b.breakdown.by_phone.map((g) => (
+                <tr key={g.group}>
+                  <td>{g.group}</td>
+                  <td className="num">{g.n}</td>
+                  {(["traditional", "learned", "hybrid"] as const).map((p) => (
+                    <td key={p} className="num">{fixed(g[p].psnr, 1)} <span className="unit">/ {fixed(g[p].delta_e, 1)}</span></td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
+
+      {b?.efficiency_sweep && b.efficiency_sweep.length > 0 && (
+        <section className="card">
+          <div className="card-head"><h2>Speed and memory vs image size</h2><p>CPU · hybrid timed with the network on</p></div>
+          <table className="table">
+            <thead>
+              <tr><th>RAW size</th><th className="num">Network FP32</th><th className="num">INT8</th><th className="num">Traditional</th><th className="num">Hybrid</th><th className="num">Hybrid memory</th></tr>
+            </thead>
+            <tbody>
+              {b.efficiency_sweep.map((r) => (
+                <tr key={String(r.megapixels)}>
+                  <td>{r.megapixels} MP <span className="unit">{r.size}</span></td>
+                  <td className="num">{Math.round(Number(r.net_fp32_ms))}<span className="unit">ms</span></td>
+                  <td className="num">{r.net_int8_ms != null ? <>{Math.round(Number(r.net_int8_ms))}<span className="unit">ms</span></> : <span className="dash">—</span>}</td>
+                  <td className="num">{Math.round(Number(r.traditional_ms))}<span className="unit">ms</span></td>
+                  <td className="num">{Math.round(Number(r.hybrid_ms))}<span className="unit">ms</span></td>
+                  <td className="num">{Math.round(Number(r.hybrid_mem_mb))}<span className="unit">MB</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {b.tiling && (
+            <p className="table-note">
+              Tiled inference ({b.tiling.image}): inside the image, tiles match one pass to{" "}
+              {Math.min(...b.tiling.variants.filter((v) => v.variant !== "single pass").map((v) => v.interior_psnr ?? 0)).toFixed(0)} dB PSNR,
+              so no seams. Large images are tiled automatically to keep memory bounded.
+            </p>
+          )}
+        </section>
+      )}
+
+      {b?.phone_raw && b.phone_raw.length > 0 && (
+        <section className="card">
+          <div className="card-head">
+            <h2>Real phone RAW files</h2>
+            <p>{b.phone_raw.filter((p) => p.passed).length} of {b.phone_raw.length} pass · sensor input | traditional | hybrid</p>
+          </div>
+          <div className="gallery">
+            {b.phone_raw.map((p) => (
+              <figure key={p.file}>
+                {p.preview && <img src={`/api/results-files/${p.preview.replace(/^results\//, "")}`} alt={`${p.file}: sensor input, traditional and hybrid renders`} loading="lazy" />}
+                <figcaption className="small muted" style={{ marginTop: 6 }}>
+                  <b style={{ color: "var(--text)", fontWeight: 500 }}>{p.file.replace(/\.dng$/i, "")}</b>
+                  {p.libraw && ` · ${p.libraw.raw_type === "Stack" ? "linear DNG" : `${p.libraw.cfa} Bayer`} · black ${p.libraw.black_level_per_channel[0]} / white ${p.libraw.white_level}`}
+                  {p.route && ` · ${p.route.wb} WB`}
+                  {p.checks && ` · within ${p.checks.colour_vs_camera_wb_deg.toFixed(1)}° of the camera's colour`}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
       {b?.failures && b.failures.length > 0 && (
         <section className="card">
           <div className="card-head"><h2>Where it still fails</h2><p>Honest failure cases</p></div>

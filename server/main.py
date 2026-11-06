@@ -322,6 +322,9 @@ def benchmarks():
     if RESULTS_JSON.exists():
         data = json.loads(RESULTS_JSON.read_text(encoding="utf-8"))
         data.pop("per_image", None)  # large; kept in the file for the report, not needed by the UI
+        phone = RESULTS_JSON.parent / "phone_raw.json"
+        if phone.exists():
+            data["phone_raw"] = json.loads(phone.read_text(encoding="utf-8"))
         return JSONResponse(data)
     return JSONResponse({"status": "pending", "message": "Evaluation results have not been generated yet."})
 

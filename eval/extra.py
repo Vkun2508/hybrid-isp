@@ -83,7 +83,7 @@ def _raw_at(raw: RawImage, mp: float) -> RawImage:
     return raw.copy(bayer=unpack(q2), gt=None)
 
 
-def efficiency_sweep(manifest: Path, sample: Path, sizes=(0.5, 1, 2, 4, 8)) -> list[dict]:
+def efficiency_sweep(manifest: Path, sample: Path, sizes=(0.5, 1, 2, 4)) -> list[dict]:
     """Network latency + peak memory for FP32/INT8, and whole-pipeline latency, at several resolutions."""
     models = _variant_models(manifest)
     raw0 = load_pair(sample)[0]

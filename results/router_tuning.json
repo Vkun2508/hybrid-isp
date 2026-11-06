@@ -17,552 +17,674 @@
     "noise + under-exposed"
   ],
   "start": {
-    "psnr": 24.03010803732274,
-    "delta_e": 10.194720688462258
+    "psnr": 24.90517493731746,
+    "delta_e": 9.843912133574486
   },
   "best": {
-    "psnr": 24.717557420344043,
-    "delta_e": 9.693997552990913
+    "psnr": 25.33172193353166,
+    "delta_e": 9.503769317269326
   },
   "config": {
     "wb_angle_lo": 5.0,
     "wb_angle_hi": 15.0,
-    "fast_sigma": 0.002,
+    "wb_spread_max": 4.0,
+    "fast_sigma": 0.004,
     "high_sigma": 0.02,
-    "sharpen_k": 0.0,
+    "sharpen_k": 0.15,
     "sharpen_sigma0": 0.01,
     "ev_threshold": 0.4,
     "local_tone_dr": 12.0,
-    "tuned_on": "SIDD-CC validation scene 003 (8 images x 5 conditions), model 'Placeholder (classical stand-in)', 2026-11-06 22:21"
+    "residual_k": 2.0,
+    "tuned_on": "SIDD-CC validation scene 003 (8 images x 5 conditions), model 'LightweightISPUNet (SIDD-CC RAW denoiser)', 2026-11-07 00:40"
   },
   "history": [
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.03010803732274,
-      "delta_e": 10.194720688462258,
+      "psnr": 24.90517493731746,
+      "delta_e": 9.843912133574486,
       "step": "defaults"
     },
     {
       "config": {
         "wb_angle_lo": 8.0,
         "wb_angle_hi": 16.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.618581055045542,
-      "delta_e": 10.543438914418221,
+      "psnr": 24.487878490552866,
+      "delta_e": 10.182869324088097,
       "step": "round 1: wb=(8.0, 16.0)"
     },
     {
       "config": {
         "wb_angle_lo": 10.0,
         "wb_angle_hi": 20.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.386844958135907,
-      "delta_e": 10.786231735348702,
+      "psnr": 24.24082844547194,
+      "delta_e": 10.43764178454876,
       "step": "round 1: wb=(10.0, 20.0)"
     },
     {
       "config": {
         "wb_angle_lo": 12.0,
         "wb_angle_hi": 24.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.31142324709706,
-      "delta_e": 10.80525075495243,
+      "psnr": 24.16369201481155,
+      "delta_e": 10.448947033286094,
       "step": "round 1: wb=(12.0, 24.0)"
     },
     {
       "config": {
         "wb_angle_lo": 15.0,
         "wb_angle_hi": 30.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.22208817877842,
-      "delta_e": 10.863515689969063,
+      "psnr": 24.069185819660746,
+      "delta_e": 10.508465561270715,
       "step": "round 1: wb=(15.0, 30.0)"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.004,
-        "high_sigma": 0.03,
-        "sharpen_k": 0.0,
-        "sharpen_sigma0": 0.01,
-        "ev_threshold": 0.6,
-        "local_tone_dr": 12.0,
-        "tuned_on": "defaults (not tuned)"
-      },
-      "psnr": 24.433394758896856,
-      "delta_e": 10.14606349170208,
-      "step": "round 1: sharpen_k=0.0"
-    },
-    {
-      "config": {
-        "wb_angle_lo": 5.0,
-        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.32152975451454,
-      "delta_e": 10.159183380007743,
+      "psnr": 25.124613411635455,
+      "delta_e": 9.822585162520408,
       "step": "round 1: sharpen_k=0.15"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.3,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.20096759674729,
-      "delta_e": 10.173735603690147,
+      "psnr": 25.041924769798122,
+      "delta_e": 9.830847802758218,
       "step": "round 1: sharpen_k=0.3"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.004,
         "high_sigma": 0.03,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.03010803732274,
-      "delta_e": 10.194720688462258,
+      "psnr": 24.90517493731746,
+      "delta_e": 9.843912133574486,
       "step": "round 1: sharpen_k=0.5"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.002,
         "high_sigma": 0.03,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.43336714136396,
-      "delta_e": 10.145632621645927,
+      "psnr": 25.124685990509384,
+      "delta_e": 9.823073109984398,
       "step": "round 1: fast_sigma=0.002"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.004,
-        "high_sigma": 0.03,
-        "sharpen_k": 0.0,
-        "sharpen_sigma0": 0.01,
-        "ev_threshold": 0.6,
-        "local_tone_dr": 12.0,
-        "tuned_on": "defaults (not tuned)"
-      },
-      "psnr": 24.433394758896856,
-      "delta_e": 10.14606349170208,
-      "step": "round 1: fast_sigma=0.004"
-    },
-    {
-      "config": {
-        "wb_angle_lo": 5.0,
-        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.008,
         "high_sigma": 0.03,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.43341156999822,
-      "delta_e": 10.146655413508416,
+      "psnr": 25.124081937407986,
+      "delta_e": 9.822672471404076,
       "step": "round 1: fast_sigma=0.008"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.016,
         "high_sigma": 0.03,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.275260470809048,
-      "delta_e": 10.292874494194985,
+      "psnr": 24.75952059862043,
+      "delta_e": 10.080855491757394,
       "step": "round 1: fast_sigma=0.016"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.662798750092236,
-      "delta_e": 9.902427652478218,
+      "psnr": 25.27649202371572,
+      "delta_e": 9.711552014946937,
       "step": "round 1: high_sigma=0.02"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.03,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.43336714136396,
-      "delta_e": 10.145632621645927,
+      "psnr": 25.124613411635455,
+      "delta_e": 9.822585162520408,
       "step": "round 1: high_sigma=0.03"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.05,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.26040021184486,
-      "delta_e": 10.383615580201148,
+      "psnr": 25.000653075618555,
+      "delta_e": 9.941596439480781,
       "step": "round 1: high_sigma=0.05"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.717557420344043,
-      "delta_e": 9.693997552990913,
+      "psnr": 25.33172193353166,
+      "delta_e": 9.503769317269326,
       "step": "round 1: ev_threshold=0.4"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.662798750092236,
-      "delta_e": 9.902427652478218,
+      "psnr": 25.27649202371572,
+      "delta_e": 9.711552014946937,
       "step": "round 1: ev_threshold=0.6"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 1.0,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.393611593800323,
-      "delta_e": 10.79426648914814,
+      "psnr": 25.006060432857236,
+      "delta_e": 10.607927575707436,
       "step": "round 1: ev_threshold=1.0"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 0.0,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.113543827094503,
+      "delta_e": 9.496825337409973,
+      "step": "round 1: residual_k=0.0"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 1.5,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.0694012406672,
+      "delta_e": 9.612593352794647,
+      "step": "round 1: residual_k=1.5"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 3.0,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.31550299637849,
+      "delta_e": 9.4738820374012,
+      "step": "round 1: residual_k=3.0"
     },
     {
       "config": {
         "wb_angle_lo": 8.0,
         "wb_angle_hi": 16.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.301795019754877,
-      "delta_e": 10.044408538937569,
+      "psnr": 24.917997268248836,
+      "delta_e": 9.841393384337426,
       "step": "round 2: wb=(8.0, 16.0)"
     },
     {
       "config": {
         "wb_angle_lo": 10.0,
         "wb_angle_hi": 20.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.072578330345955,
-      "delta_e": 10.289549413323403,
+      "psnr": 24.67217646870936,
+      "delta_e": 10.097490033507347,
       "step": "round 2: wb=(10.0, 20.0)"
     },
     {
       "config": {
         "wb_angle_lo": 12.0,
         "wb_angle_hi": 24.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.99112715586599,
-      "delta_e": 10.308857157826424,
+      "psnr": 24.59207558120182,
+      "delta_e": 10.108906957507134,
       "step": "round 2: wb=(12.0, 24.0)"
     },
     {
       "config": {
         "wb_angle_lo": 15.0,
         "wb_angle_hi": 30.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 23.897722170572084,
-      "delta_e": 10.367544868588448,
+      "psnr": 24.49552246788608,
+      "delta_e": 10.168614134192467,
       "step": "round 2: wb=(15.0, 30.0)"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
-        "high_sigma": 0.02,
-        "sharpen_k": 0.15,
-        "sharpen_sigma0": 0.01,
-        "ev_threshold": 0.4,
-        "local_tone_dr": 12.0,
-        "tuned_on": "defaults (not tuned)"
-      },
-      "psnr": 24.592794809029453,
-      "delta_e": 9.708220836520194,
-      "step": "round 2: sharpen_k=0.15"
-    },
-    {
-      "config": {
-        "wb_angle_lo": 5.0,
-        "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
         "sharpen_k": 0.3,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.459499241541373,
-      "delta_e": 9.723922637104987,
+      "psnr": 25.24260755110036,
+      "delta_e": 9.512513211369514,
       "step": "round 2: sharpen_k=0.3"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
         "sharpen_k": 0.5,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.27216094164971,
-      "delta_e": 9.74648184478283,
+      "psnr": 25.096465269456612,
+      "delta_e": 9.526259717345237,
       "step": "round 2: sharpen_k=0.5"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.004,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.002,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.717585037876937,
-      "delta_e": 9.694428423047066,
-      "step": "round 2: fast_sigma=0.004"
+      "psnr": 25.33179451240559,
+      "delta_e": 9.504257264733315,
+      "step": "round 2: fast_sigma=0.002"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.008,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.717601848978298,
-      "delta_e": 9.6950203448534,
+      "psnr": 25.33119045930419,
+      "delta_e": 9.503856626152992,
       "step": "round 2: fast_sigma=0.008"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
         "fast_sigma": 0.016,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.55945074978913,
-      "delta_e": 9.841239425539971,
+      "psnr": 24.966629120516636,
+      "delta_e": 9.76203964650631,
       "step": "round 2: fast_sigma=0.016"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.03,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.48823907988094,
-      "delta_e": 9.932542869448662,
+      "psnr": 25.179865038553107,
+      "delta_e": 9.613720473647117,
       "step": "round 2: high_sigma=0.03"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.05,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.4,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.31480995511642,
-      "delta_e": 10.18257397711277,
+      "psnr": 25.05570364852319,
+      "delta_e": 9.73798249065876,
       "step": "round 2: high_sigma=0.05"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 0.6,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.662798750092236,
-      "delta_e": 9.902427652478218,
+      "psnr": 25.27649202371572,
+      "delta_e": 9.711552014946937,
       "step": "round 2: ev_threshold=0.6"
     },
     {
       "config": {
         "wb_angle_lo": 5.0,
         "wb_angle_hi": 15.0,
-        "fast_sigma": 0.002,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
         "high_sigma": 0.02,
-        "sharpen_k": 0.0,
+        "sharpen_k": 0.15,
         "sharpen_sigma0": 0.01,
         "ev_threshold": 1.0,
         "local_tone_dr": 12.0,
+        "residual_k": 2.0,
         "tuned_on": "defaults (not tuned)"
       },
-      "psnr": 24.393611593800323,
-      "delta_e": 10.79426648914814,
+      "psnr": 25.006060432857236,
+      "delta_e": 10.607927575707436,
       "step": "round 2: ev_threshold=1.0"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 0.0,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.113543827094503,
+      "delta_e": 9.496825337409973,
+      "step": "round 2: residual_k=0.0"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 1.5,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.0694012406672,
+      "delta_e": 9.612593352794647,
+      "step": "round 2: residual_k=1.5"
+    },
+    {
+      "config": {
+        "wb_angle_lo": 5.0,
+        "wb_angle_hi": 15.0,
+        "wb_spread_max": 4.0,
+        "fast_sigma": 0.004,
+        "high_sigma": 0.02,
+        "sharpen_k": 0.15,
+        "sharpen_sigma0": 0.01,
+        "ev_threshold": 0.4,
+        "local_tone_dr": 12.0,
+        "residual_k": 3.0,
+        "tuned_on": "defaults (not tuned)"
+      },
+      "psnr": 25.31550299637849,
+      "delta_e": 9.4738820374012,
+      "step": "round 2: residual_k=3.0"
     }
   ]
 }

@@ -53,14 +53,26 @@ The router then decides:
 | `fast_sigma` ≤ σ_eff < `high_sigma` | learned core |
 | σ_eff ≥ `high_sigma` | learned core + chroma-only cleanup, weaker sharpening |
 | under-exposed beyond `ev_threshold` | digital gain (≤ ×16) **after** denoising |
-| WB disagreement > `wb_angle_lo` | blend towards shades-of-gray; replace beyond `wb_angle_hi` |
+| WB disagreement > `wb_angle_lo` **and** the estimators agree (spread ≤ `wb_spread_max`) | blend towards shades-of-gray; replace beyond `wb_angle_hi` |
+| WB estimators disagree with each other (colourful scene) | keep the camera's as-shot WB |
 | no WB metadata | shades-of-gray |
 | dynamic range > `local_tone_dr` stops | local tone mapping |
+| always, after the network | **noise-model trust region:** a correction is limited to `residual_k`·σ(x) |
 
-Every decision is reported as a sentence ("why this route") in the UI. Thresholds live in `isp/router_config.json`.
+Every decision is reported as a sentence ("why this route") in the UI. Thresholds live in `isp/router_config.json`, tuned on the validation scene only by `eval/tune_router.py`.
+
+**Two classical safeguards around the network** (both found on real data, see [failure_cases.md](failure_cases.md)):
+- **Noise-model trust region:**
+  - The sensor's noise-level function σ²(x) = a·x + b is fitted from each image (`estimate_nlf`): the local high-pass variance per brightness bin, flat regions only.
+  - The network may change a pixel by at most k·σ(x).
+  - So it can remove noise but cannot erase real detail or shift highlights. It fixed the network's over-smoothing of bright regions, which its mostly dark training data never taught it.
+- **White-balance consensus:**
+  - The camera's as-shot WB is only second-guessed when gray-world, shades-of-gray and gray-edge agree with each other (within 4°).
+  - On colourful scenes they disagree, so the camera is trusted. This fixed a sunflower DNG turning blue.
+  - Highlights are excluded relative to the image (the brightest 2%), so the estimate doesn't change with exposure.
 
 **Order inside the hybrid** (and why), from [architecture.md](architecture.md):
-1. Network on native RAW, its training distribution.
+1. Network on native RAW, its training distribution, then the noise-model trust region.
 2. Router white balance and gain.
 3. Malvar demosaic.
 4. Calibrated colour matrix.
@@ -114,6 +126,11 @@ See [failure_cases.md](failure_cases.md), generated from the worst test images.
 - **Few scenes:** SIDD has only 10 physical scenes, so 2 test scenes is a small sample. Per-image numbers are in `benchmarks.json`.
 - **Simulated degradations:** the robustness sweeps add simulated noise, exposure and WB errors to real RAW. Real low-light captures also have row noise, fixed-pattern noise and black-level drift, which are not modelled.
 - **Web-demo compromises:** inputs are binned to ≤ 2 MP, and live scores use a centre crop. The official numbers are full-crop, offline.
+- **Training stopped early:** the Kaggle run diverged at epoch 13, so the exported model is the epoch-11 checkpoint. The notebook has a fix (float32 loss, lower learning rate) that was not re-run before the deadline.
+- **The network alone over-smooths bright regions:** its training data is mostly dark. The hybrid's trust region contains this, but the learned-only baseline shows it.
+- **LPIPS prefers the network alone:** it scores slightly better than the hybrid on LPIPS, while the hybrid wins PSNR, SSIM and ΔE. The hybrid's classical sharpening and chroma cleanup trade some perceptual texture for fidelity.
+- **Texture vs noise:** fine periodic texture (fabric weave) is indistinguishable from noise for single-photo noise estimators, so the router can over-denoise it. Camera noise metadata (DNG `NoiseProfile`, ISO) would fix this.
+- **WB robustness trade-off:** the consensus check means a genuinely wrong camera WB on a colourful scene is left uncorrected (see failure case 4).
 
 ## 9. Ethics and privacy
 - Uploads are processed in memory and never stored. Results expire from a small in-memory cache, and outputs carry no metadata.
