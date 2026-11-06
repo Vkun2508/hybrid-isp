@@ -1,0 +1,44 @@
+{
+  "device_for_latency": "CPU x4 (Kaggle)",
+  "onnx_exporter": "torchscript",
+  "onnx_parity_max_abs_diff": {
+    "256x256": 1.4901161193847656e-07,
+    "192x320": 1.4901161193847656e-07
+  },
+  "noisy_input": {
+    "raw_psnr_db": 43.87,
+    "raw_ssim": 0.9618
+  },
+  "variants": [
+    {
+      "variant": "PyTorch FP32 (CPU)",
+      "params": 1004996,
+      "size_mb": 4.02,
+      "latency_ms_1mp_cpu": 652.9,
+      "rss_delta_mb": 122.3,
+      "raw_psnr_db": 47.708,
+      "raw_ssim": 0.9779
+    },
+    {
+      "variant": "ONNX Runtime FP32",
+      "params": 1004996,
+      "size_mb": 4.036,
+      "latency_ms_1mp_cpu": 335.2,
+      "rss_delta_mb": 167.8,
+      "raw_psnr_db": 47.708,
+      "raw_ssim": 0.9779
+    },
+    {
+      "variant": "ONNX Runtime INT8",
+      "params": 1004996,
+      "size_mb": 1.156,
+      "latency_ms_1mp_cpu": 328.7,
+      "rss_delta_mb": 134.2,
+      "raw_psnr_db": 46.751,
+      "raw_ssim": 0.9767
+    }
+  ],
+  "int8_vs_fp32_psnr_drop_db": 0.957,
+  "quality_patches": 40,
+  "quality_split": "test"
+}

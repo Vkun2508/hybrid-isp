@@ -1,0 +1,23 @@
+{
+  "trained_checkpoint": true,
+  "best_val_psnr": 52.428420278920385,
+  "epochs_trained": 21,
+  "evaluation_metrics": {
+    "Test Loss": 0.003319481504149735,
+    "RAW PSNR (dB)": 47.91988212543213,
+    "RAW SSIM": 0.9785429750879605,
+    "Rendered sRGB PSNR (dB)": 28.631082913079105,
+    "PSNR R (dB)": 48.33530860300444,
+    "PSNR G1 (dB)": 46.599534639486365,
+    "PSNR G2 (dB)": 47.070900569256004,
+    "PSNR B (dB)": 52.161337031233266,
+    "Noisy input RAW PSNR (dB)": 43.66819836456093,
+    "Test scenes": [
+      "004",
+      "008"
+    ],
+    "Test pairs": 12,
+    "best_val_psnr": 52.428420278920385,
+    "epochs_trained": 21
+  }
+}

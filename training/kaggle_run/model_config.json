@@ -1,0 +1,17 @@
+{
+  "model_architecture": "LightweightISPUNet",
+  "in_channels": 4,
+  "out_channels": 4,
+  "base_channels": 32,
+  "parameters": 1004996,
+  "patch_size": 128,
+  "supported_cfa": [
+    "rggb",
+    "bggr",
+    "grbg",
+    "gbrg"
+  ],
+  "normalization": "(raw - BlackLevel)/(WhiteLevel - BlackLevel)",
+  "output_format": "Canonical [R, G1, G2, B] float32 Bayer RAW",
+  "training_checkpoint_verified": true
+}

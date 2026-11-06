@@ -1,0 +1,12 @@
+{
+  "name": "LightweightISPUNet (SIDD-CC RAW denoiser)",
+  "file": "isp_unet.onnx",
+  "input": "raw4",
+  "input_wb": false,
+  "output": "raw4",
+  "upscale": 1,
+  "pad_multiple": 8,
+  "layout": "NCHW",
+  "tile": 1024,
+  "overlap": 32
+}
