@@ -16,6 +16,6 @@ def unsharp_luma(srgb: np.ndarray, amount: float, radius: float = 1.2) -> np.nda
     return np.clip(cv2.cvtColor(ycc, cv2.COLOR_YCrCb2RGB), 0, 1)
 
 
-def noise_aware_amount(sigma: float, k: float = 0.8, sigma0: float = 0.01) -> float:
+def noise_aware_amount(sigma: float, k: float = 0.5, sigma0: float = 0.01) -> float:
     """Sharpening strength k / (1 + sigma / sigma0): weaker sharpening on noisy images."""
     return float(k / (1.0 + sigma / sigma0))

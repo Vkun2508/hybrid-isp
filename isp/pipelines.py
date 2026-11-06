@@ -129,7 +129,14 @@ def to_display(y: np.ndarray, output: str, cam2rgb: np.ndarray) -> np.ndarray:
 def naive_render(raw: RawImage) -> np.ndarray:
     """The sensor data with no processing beyond bilinear demosaic + as-shot colour (the 'input' view)."""
     x = wb.apply_gains(raw.bayer, raw.wb_gains or wb.gray_world(raw.bayer))
-    return render_linear_camera(demosaic.bilinear(x), raw.cam2rgb)
+    return render_linear_camera(demosaic.bilinear(x) * raw.exposure, raw.cam2rgb)
+
+
+def reference_render(bayer: np.ndarray, raw: RawImage) -> np.ndarray:
+    """How ground-truth RAW is turned into the sRGB reference for metrics: as-shot WB, Malvar,
+    baseline exposure, CCM, tone. No denoise, no sharpening (those are what is being evaluated)."""
+    x = wb.apply_gains(bayer, raw.wb_gains or wb.gray_world(bayer))
+    return render_linear_camera(demosaic.malvar(x) * raw.exposure, raw.cam2rgb)
 
 
 def noise_std_map(raw: RawImage, x: np.ndarray, sigma: float, gain: float) -> np.ndarray:
@@ -158,7 +165,7 @@ def traditional(raw: RawImage, a: Analysis, route: Route, model: LearnedModel, o
     st.append(Stage("Demosaic", t.lap(), viz_linear(rgb), "Malvar-He-Cutler 5x5"))
     rgb = denoise.bilateral(rgb, a.sigma)
     st.append(Stage("Denoise", t.lap(), viz_linear(rgb), f"Bilateral, range sigma = 3 x {a.sigma:.4f}"))
-    rgb = np.clip(apply_ccm(rgb, raw.cam2rgb), 0, 1)
+    rgb = np.clip(apply_ccm(rgb * raw.exposure, raw.cam2rgb), 0, 1)
     st.append(Stage("Colour (CCM)", t.lap(), viz_linear(rgb), "Camera RGB -> linear sRGB"))
     out = tone.global_tone(rgb)
     st.append(Stage("Tone + gamma", t.lap(), viz_srgb(out), "sRGB gamma + S-curve"))
@@ -180,7 +187,7 @@ def learned(raw: RawImage, a: Analysis, route: Route, model: LearnedModel, opts:
     st: list[Stage] = []
     t = _Timer()
     m = model.m
-    x = raw.bayer
+    x = raw.bayer if m.output == "raw4" else raw.bayer * raw.exposure
     wb_done = False
     if m.input_wb:
         x = wb.apply_gains(x, raw.wb_gains or wb.gray_world(raw.bayer))
@@ -194,7 +201,7 @@ def learned(raw: RawImage, a: Analysis, route: Route, model: LearnedModel, opts:
         st.append(Stage("Network (RAW denoise)", t.lap(), viz_mosaic(y), model.info.name))
         if not wb_done:
             y = wb.apply_gains(y, raw.wb_gains or wb.gray_world(raw.bayer))
-        out = render_linear_camera(demosaic.bilinear(y), raw.cam2rgb)
+        out = render_linear_camera(demosaic.bilinear(y) * raw.exposure, raw.cam2rgb)
         st.append(Stage("Minimal render", t.lap(), viz_srgb(out), "Bilinear demosaic + as-shot WB + CCM + gamma"))
     else:
         if m.input == "raw4":
@@ -243,9 +250,7 @@ def _hybrid_raw_denoiser(raw, a, route, model, opts) -> PipelineResult:
                         model.info.name + (" (placeholder)" if model.is_stub else "")))
 
     # 2. Classical: router-chosen WB + exposure normalisation (after denoising, so noise isn't amplified first).
-    x = wb.apply_gains(bayer, route.wb_gains)
-    if route.gain != 1.0:
-        x = x * route.gain
+    x = wb.apply_gains(bayer, route.wb_gains) * (route.gain * raw.exposure)
     st.append(Stage("WB + exposure", t.lap(), viz_mosaic(np.clip(x, 0, 1)), f"{route.wb_method} WB, gain x{route.gain:.1f}"))
 
     # 3. Demosaic (+ light classical denoise on the fast path).
@@ -267,7 +272,7 @@ def _hybrid_raw_denoiser(raw, a, route, model, opts) -> PipelineResult:
         st.append(Stage("Chroma cleanup", t.lap(), viz_srgb(out), f"Bilateral on Cr/Cb, strength {route.chroma:.2f}"))
 
     # 5. Noise-aware sharpening on what's left after denoising (scaled by the gain).
-    amount = route.sharpen if not opts.router else sharpen.noise_aware_amount(resid_sigma * route.gain)
+    amount = route.sharpen if not opts.router else sharpen.noise_aware_amount(resid_sigma * route.gain * raw.exposure)
     if opts.sharpen and amount > 0:
         out = sharpen.unsharp_luma(out, amount)
     st.append(Stage("Sharpen", t.lap(), viz_srgb(out), f"Noise-aware amount {amount if opts.sharpen else 0:.2f}"))
@@ -284,8 +289,7 @@ def _hybrid_rgb_model(raw, a, route, model, opts) -> PipelineResult:
     st.append(Stage("RAW mosaic", 0.0, viz_mosaic(raw.bayer), "Black level removed, RGGB, normalised"))
     pre_wb = m.input_wb or route.path == "fast"
     x = wb.apply_gains(raw.bayer, route.wb_gains) if pre_wb else raw.bayer.copy()
-    if route.gain != 1.0:
-        x = np.minimum(x * route.gain, 1.0)
+    x = np.minimum(x * (route.gain * raw.exposure), 1.0)
     st.append(Stage("WB + exposure", t.lap(), viz_mosaic(np.clip(x, 0, 1)), f"{route.wb_method} WB, gain x{route.gain:.1f}"))
     if route.path == "fast":
         rgb = denoise.guided_filter(_demosaic(x, opts.demosaic), radius=2, eps=(1.5 * route.sigma_eff) ** 2)

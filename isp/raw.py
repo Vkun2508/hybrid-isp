@@ -22,6 +22,7 @@ class RawImage:
     cam2rgb: np.ndarray = field(default_factory=lambda: IDENTITY.copy())
     gt: np.ndarray | None = None
     noise_profile: tuple[float, float] | None = None  # variance = a*x + b
+    exposure: float = 1.0  # scene baseline exposure (like DNG BaselineExposure), applied by EVERY pipeline
     flip: int = 0  # rawpy/libraw orientation code, applied only when displaying
     meta: dict = field(default_factory=dict)
 

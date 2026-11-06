@@ -13,3 +13,4 @@ web/dist/
 # secrets
 kaggle.json
 .env
+.cache/

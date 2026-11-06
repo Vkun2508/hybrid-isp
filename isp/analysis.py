@@ -58,8 +58,10 @@ def analyze(raw: RawImage) -> Analysis:
     q = pack(raw.bayer)
     g = 0.5 * (q[..., 1] + q[..., 2])
     sigma = estimate_sigma(q[..., 1])
-    mean_g = float(g.mean())
-    ev = float(np.log2(max(mean_g, 1e-6) / TARGET_MEAN))
+    mean_g = float(g.mean()) * raw.exposure  # relative to the scene's baseline exposure
+    # Under-exposure = how much more gain the same highlight-aware AE used for the scene would add now.
+    needed = auto_exposure(raw.bayer * raw.exposure)
+    ev = float(-np.log2(needed)) if needed > 1.0 else float(max(np.log2(max(mean_g, 1e-6) / TARGET_MEAN), 0.0))
     clipped = float((q.max(axis=-1) >= 0.98).mean())
 
     sog = shades_of_gray(raw.bayer)
@@ -70,10 +72,22 @@ def analyze(raw: RawImage) -> Analysis:
         angle, wb_conf = None, 0.0
 
     small = cv2.resize(g, (max(1, g.shape[1] // 4), max(1, g.shape[0] // 4)), interpolation=cv2.INTER_AREA)
-    lo, hi = np.percentile(small, [0.5, 99.5])
-    dr = float(np.log2((hi + 1e-4) / (lo + 1e-4)))
+    lo, hi = np.maximum(np.percentile(small, [0.5, 99.5]), 0.0)  # RAW keeps negative noise values
+    # Measurable dynamic range stops at the noise floor (noise std after 4x4 averaging = sigma/4).
+    lo = max(lo, 3.0 * sigma / 4.0, 1e-4)
+    dr = float(np.log2(max(hi, lo) / lo))
     return Analysis(sigma=sigma, ev=ev, clipped=clipped, wb_conf=wb_conf, wb_angle=angle,
                     dynamic_range=dr, mean_level=mean_g)
+
+
+def auto_exposure(bayer: np.ndarray, target: float = 0.14) -> float:
+    """Scene baseline exposure for real RAW (what a camera's AE would pick): bring the mean green to
+    `target` without pushing more than ~1% of pixels past white. Clamped to [1, 16]."""
+    q = pack(bayer)
+    g = np.maximum(0.5 * (q[..., 1] + q[..., 2]), 0)
+    mean, p99 = float(g.mean()), float(np.percentile(g[::2, ::2], 99))
+    e = min(target / max(mean, 1e-5), 1.0 / max(p99, 1e-5))
+    return float(np.clip(e, 1.0, 16.0))
 
 
 def _blend_gains(a, b, w: float) -> tuple[float, float, float]:
@@ -89,7 +103,7 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
 
     # Exposure
     if a.ev < -0.6:
-        gain = float(min(2.0 ** (-a.ev), MAX_GAIN))
+        gain = float(min(2.0 ** (-a.ev), MAX_GAIN))  # = the scene AE's extra gain
         reasons.append(f"Under-exposed by {-a.ev:.1f} EV -> digital gain x{gain:.1f} before the network (noise map scaled to match).")
     else:
         gain = 1.0
@@ -110,8 +124,8 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
         wb_method, wb_gains = "blend", _blend_gains(raw.wb_gains, sog, a.wb_conf)
         reasons.append(f"As-shot white balance is uncertain ({a.wb_angle:.1f} deg off) -> blended {a.wb_conf:.0%} as-shot / shades-of-gray.")
 
-    # Noise -> path
-    sigma_eff = a.sigma * gain
+    # Noise -> path (noise as it will be seen: after the router gain and the scene's baseline exposure)
+    sigma_eff = a.sigma * gain * raw.exposure
     if force_path:
         path, forced = force_path, True
         reasons.append(f"Router override: path forced to '{force_path}'.")
@@ -127,7 +141,7 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
 
     chroma = float(np.clip((sigma_eff - HIGH_SIGMA) / HIGH_SIGMA + 0.5, 0.0, 1.0)) if path == "learned_chroma" else 0.0
     sharpen = noise_aware_amount(sigma_eff)
-    reasons.append(f"Sharpening = 0.8 / (1 + sigma/0.01) = {sharpen:.2f}.")
+    reasons.append(f"Sharpening = 0.5 / (1 + sigma/0.01) = {sharpen:.2f}.")
 
     local = a.dynamic_range > 12.0 and gain < 4
     if local:

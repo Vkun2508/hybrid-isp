@@ -544,7 +544,7 @@ def run_onnx_export_and_quantisation():
         "name": "LightweightISPUNet (SIDD-CC RAW denoiser)",
         "file": "isp_unet_int8.onnx" if eff["int8_vs_fp32_psnr_drop_db"] < 0.3 else "isp_unet.onnx",
         "input": "raw4", "input_wb": False, "output": "raw4", "upscale": 1,
-        "pad_multiple": 8, "layout": "NCHW", "tile": 256, "overlap": 32}, indent=2))
+        "pad_multiple": 8, "layout": "NCHW", "tile": 1024, "overlap": 32}, indent=2))
     display(pd.DataFrame(rows))
     print(f"Noisy input RAW PSNR: {eff['noisy_input']['raw_psnr_db']} dB | INT8 drop vs FP32: {eff['int8_vs_fp32_psnr_drop_db']} dB")
     print(f"Saved: {fp32_path.name}, {int8_path.name}, efficiency.json, model.json -> {EXPORT_DIR}")

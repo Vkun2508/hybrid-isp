@@ -1,0 +1,92 @@
+[
+  {
+    "id": "sidd-n6-iso3200-lowlight",
+    "kind": "sidd",
+    "file": "sidd-n6-iso3200-lowlight.npz",
+    "name": "Nexus 6 · ISO 3200 · low light",
+    "description": "Real smartphone RAW from an unseen test scene, with its clean ground truth.",
+    "has_gt": true,
+    "preset": {
+      "noise": 0.0,
+      "exposure_ev": 0.0,
+      "wb_shift": 0.0
+    },
+    "source": {
+      "dataset": "SIDD-CC (Abdelhamed et al., CVPR 2018)",
+      "instance": "0076_004_N6_03200_00320_3200_L",
+      "scene": "004",
+      "camera": "N6",
+      "iso": 3200,
+      "split": "test (unseen)"
+    }
+  },
+  {
+    "id": "sidd-ip-iso1600",
+    "kind": "sidd",
+    "file": "sidd-ip-iso1600.npz",
+    "name": "iPhone 7 · ISO 1600 · indoor",
+    "description": "Real smartphone RAW from an unseen test scene, with its clean ground truth.",
+    "has_gt": true,
+    "preset": {
+      "noise": 0.0,
+      "exposure_ev": 0.0,
+      "wb_shift": 0.0
+    },
+    "source": {
+      "dataset": "SIDD-CC (Abdelhamed et al., CVPR 2018)",
+      "instance": "0191_008_IP_01600_01600_3200_N",
+      "scene": "008",
+      "camera": "IP",
+      "iso": 1600,
+      "split": "test (unseen)"
+    }
+  },
+  {
+    "id": "photo-coffee-night",
+    "kind": "image",
+    "file": "photo-coffee-night.jpg",
+    "name": "Coffee · simulated night shot",
+    "description": "A photo turned into sensor RAW, then under-exposed by 3 stops at high ISO.",
+    "has_gt": true,
+    "preset": {
+      "noise": 0.75,
+      "exposure_ev": -3.0,
+      "wb_shift": 0.0
+    },
+    "source": {
+      "dataset": "scikit-image test image 'coffee' (public domain / CC0)"
+    }
+  },
+  {
+    "id": "photo-astronaut-tungsten",
+    "kind": "image",
+    "file": "photo-astronaut-tungsten.jpg",
+    "name": "Portrait · wrong white balance",
+    "description": "A photo turned into sensor RAW, with the camera's white balance metadata badly off.",
+    "has_gt": true,
+    "preset": {
+      "noise": 0.3,
+      "exposure_ev": 0.0,
+      "wb_shift": 0.8
+    },
+    "source": {
+      "dataset": "scikit-image test image 'astronaut' (public domain / CC0)"
+    }
+  },
+  {
+    "id": "photo-cat-highiso",
+    "kind": "image",
+    "file": "photo-cat-highiso.jpg",
+    "name": "Cat · high ISO",
+    "description": "A photo turned into sensor RAW with heavy high-ISO sensor noise.",
+    "has_gt": true,
+    "preset": {
+      "noise": 0.7,
+      "exposure_ev": 0.0,
+      "wb_shift": 0.0
+    },
+    "source": {
+      "dataset": "scikit-image test image 'chelsea' (public domain / CC0)"
+    }
+  }
+]

@@ -128,8 +128,13 @@ def load_raw(data: bytes, filename: str = "") -> RawImage:
     bayer, scale = cap_bayer(bayer)
     if scale < 1:
         notes.append(f"Downscaled {orig_w}x{orig_h} -> {bayer.shape[1]}x{bayer.shape[0]} (2x2-aware binning) to stay fast.")
+    from isp.analysis import auto_exposure
+
+    exposure = auto_exposure(bayer)
+    if exposure > 1.01:
+        notes.append(f"Scene baseline exposure x{exposure:.1f} (camera-style auto exposure, applied by all three pipelines).")
     return RawImage(
-        bayer=bayer, wb_gains=wb, cam2rgb=cam2rgb, flip=flip,
+        bayer=bayer, wb_gains=wb, cam2rgb=cam2rgb, flip=flip, exposure=exposure,
         meta={"source": "raw", "filename": filename, "pattern": pattern_name,
               "orig_size": [orig_w, orig_h], "notes": notes, "has_metadata_wb": wb is not None},
     )

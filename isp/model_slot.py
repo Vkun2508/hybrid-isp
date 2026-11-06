@@ -44,7 +44,7 @@ class Manifest:
     pad_multiple: int = 8            # input H, W padded to a multiple of this (U-Net downsampling)
     needs_noise_map: bool = False    # model takes a per-pixel noise std map as an extra input/channel
     layout: str = "NCHW"             # tensor layout the model expects: "NCHW" or "NHWC"
-    tile: int = 256                  # input-space tile size (memory bound); fixed-shape models override it
+    tile: int = 1024                 # input-space tile size (memory bound); fixed-shape models override it
     overlap: int = 32                # tile overlap in input pixels (hides seams)
     notes: str = ""
 
@@ -108,7 +108,9 @@ class OnnxBackend(_Backend):
             from onnx import numpy_helper
 
             g = onnx.load(str(path), load_external_data=False).graph
-            self.params = int(sum(int(np.prod(t.dims)) for t in g.initializer))
+            # count weights/biases only (INT8 graphs also store per-channel scales and zero points)
+            self.params = int(sum(int(np.prod(t.dims)) for t in g.initializer
+                                  if not t.name.endswith(("_scale", "_zero_point"))))
             _ = numpy_helper  # keep import (validates onnx install)
         except Exception:
             self.params = None
