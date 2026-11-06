@@ -1,0 +1,66 @@
+/* Hybrid ISP — "viewing booth" tokens.
+   Dealt taste sheet: data-terminal (seed 686060516). Dark neutral surround so the interface never
+   biases colour judgement of the photos; colour lives on data and on the one Hybrid accent. */
+:root {
+  color-scheme: dark;
+
+  /* ground and surfaces (cards sit darker than the ground) */
+  --ground: #171719;
+  --surface: #131217;
+  --raised: #212023;
+  --inset: #0e0e11;          /* image well */
+  --border: #222224;
+  --rule: #1b1a1f;
+  --control: #3a3a3e;
+
+  /* text: white, one secondary grey, one meta grey (both >= 4.5:1 on --surface) */
+  --text: #ffffff;
+  --secondary: #bdbdc0;
+  --muted: #8a8c92;
+
+  /* the one hue: Hybrid's marks and 1px selection lines */
+  --accent: #4a8ad6;
+  --positive: #44a282;
+  --negative: #e5566f;
+  --warning: #d9a441;
+  --pill-positive-bg: #1b2828; --pill-positive-ink: #5fc39c;
+  --pill-negative-bg: #2c1a20; --pill-negative-ink: #e5566f;
+  --pill-warning-bg: #2a2416;  --pill-warning-ink: #d9a441;
+  --pill-neutral-bg: #212023;  --pill-neutral-ink: #bdbdc0;
+  --chart-neutral-1: #f2f2f3;
+  --chart-neutral-2: #8a8c92;
+  --grid: #2b2b2f;
+
+  --shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.45);
+
+  --radius-card: 6px;
+  --radius-thumb: 4px;
+  --radius-control: 999px;
+
+  /* 4px spacing scale */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px;
+  --gap: 24px;
+  --pad: 24px;
+  --card-pad: 20px;
+  --control-height: 34px;
+  --row-height: 44px;
+  --topbar: 56px;
+
+  --font: "Public Sans", Inter, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --fs-title: 24px;
+  --fs-section: 16px;
+  --fs-body: 14px;
+  --fs-small: 13px;
+  --fs-tiny: 12px;
+
+  /* motion: feedback only */
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (max-width: 900px) {
+  :root { --gap: 16px; --pad: 16px; --card-pad: 16px; --fs-title: 20px; }
+}

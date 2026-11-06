@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/format.ts","./src/main.tsx","./src/components/compareviewer.tsx","./src/components/inputpanel.tsx","./src/components/panels.tsx","./src/components/results.tsx","./src/components/simulator.tsx","./src/components/topbar.tsx","./vite.config.ts"],"version":"5.6.3"}
