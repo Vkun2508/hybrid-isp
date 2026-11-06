@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   ApiError, MAX_UPLOAD_MB, getHealth, getSamples, processImage,
   type ModelInfo, type ProcessResponse, type RouteMode, type Sample, type SimPreset,
@@ -30,8 +31,11 @@ export default function App() {
   const ctrl = useRef<AbortController | null>(null);
 
   const changeTab = (t: Tab) => {
-    setTab(t);
     history.replaceState(null, "", t === "results" ? "#results" : "#lab");
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (doc.startViewTransition && !still) doc.startViewTransition(() => flushSync(() => setTab(t)));
+    else setTab(t);
   };
 
   // boot: model status + samples; the first sample is precomputed on the server, so it lands instantly

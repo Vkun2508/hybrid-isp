@@ -310,7 +310,35 @@ footer.foot p + p { margin-top: 4px; }
   .stage-top { margin-top: 0; }
 }
 
+/* tab switch: a short crossfade (the sticky top bar stays put) */
+.topbar { view-transition-name: topbar; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 160ms; animation-timing-function: var(--ease-out); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; scroll-behavior: auto !important; }
   .progress::after { left: 0; width: 100%; opacity: 0.6; }
 }
+
+/* ---------------------------------------------------------------- ux preflight */
+/* #13 hit targets: on touch screens every control is at least 44px tall (sliders included) */
+@media (pointer: coarse) {
+  .btn, .seg button, .select, .tab { min-height: 44px; }
+  .btn.text { min-height: 44px; padding: 0 8px; }
+  .range-wrap, .range { height: 44px; }
+  .range-wrap .track, .range-wrap .fill { top: 21px; }
+  .range-wrap .zero { top: 17px; }
+  .sample { min-height: 44px; }
+}
+
+/* #14 safe areas (index.html sets viewport-fit=cover): nothing sits under a notch or the home bar */
+.topbar { padding-left: max(var(--pad), env(safe-area-inset-left)); padding-right: max(var(--pad), env(safe-area-inset-right)); }
+.lab, .results { padding-left: max(var(--pad), env(safe-area-inset-left)); padding-right: max(var(--pad), env(safe-area-inset-right)); }
+footer.foot { padding-left: max(var(--pad), env(safe-area-inset-left)); padding-right: max(var(--pad), env(safe-area-inset-right));
+  padding-bottom: max(var(--s8), calc(env(safe-area-inset-bottom) + var(--s4))); }
+
+/* #17 balanced headings, no orphan words in paragraphs */
+h1, h2, h3 { text-wrap: balance; }
+p, li, figcaption { text-wrap: pretty; }
+
+/* #18 continuous (squircle) corners where supported; others keep the plain radius */
+.card, .well, .drop, .sample, .lens, .stage .shot, .gallery img { corner-shape: squircle; }

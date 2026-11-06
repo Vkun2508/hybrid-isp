@@ -36,7 +36,7 @@ CONDITIONS = [
 ]
 GRID = {
     "wb": [(5.0, 15.0), (8.0, 16.0), (10.0, 20.0), (12.0, 24.0), (15.0, 30.0)],
-    "sharpen_k": [0.0, 0.15, 0.3, 0.5],
+    "sharpen_k": [0.15, 0.3, 0.5],  # >= 0.15: the brief requires a sharpening stage; PSNR alone would pick 0
     "fast_sigma": [0.002, 0.004, 0.008, 0.016],
     "high_sigma": [0.02, 0.03, 0.05],
     "ev_threshold": [0.4, 0.6, 1.0],

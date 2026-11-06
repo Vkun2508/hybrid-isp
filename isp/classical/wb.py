@@ -20,7 +20,10 @@ def _channel_stats(bayer: np.ndarray, p: float) -> np.ndarray:
     """Minkowski p-norm mean of R, G, B over unclipped pixels (p=1 gray-world, p=inf white-patch)."""
     q = pack(bayer)
     rgb = np.stack([q[..., 0], 0.5 * (q[..., 1] + q[..., 2]), q[..., 3]], axis=-1).reshape(-1, 3)
-    keep = rgb.max(axis=1) < 0.97  # ignore clipped highlights
+    # Ignore clipped pixels AND the brightest 2% (speculars): a relative cut keeps the estimate the same
+    # when the whole exposure changes (a fixed 0.97 cut let under-exposed speculars dominate the p=6 norm).
+    peak = rgb.max(axis=1)
+    keep = (peak < 0.97) & (peak <= np.percentile(peak, 98))
     if keep.sum() > 100:
         rgb = rgb[keep]
     if np.isinf(p):
