@@ -1,0 +1,505 @@
+[
+  {
+    "file": "galaxys22ultra.dng",
+    "size_mb": 26.8,
+    "libraw": {
+      "raw_type": "Stack",
+      "cfa": "none (linear)",
+      "colors": 3,
+      "black_level_per_channel": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "white_level": 4095,
+      "as_shot_wb": [
+        2.0237,
+        1.0,
+        1.649,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        3648,
+        2736
+      ],
+      "flip": 0
+    },
+    "decode_ms": 743,
+    "loaded": {
+      "pattern": "linear (re-mosaiced)",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 1.0,
+      "wb_gains": [
+        2.024,
+        1.0,
+        1.649
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Linear (already demosaiced) DNG: re-mosaiced to RGGB for a like-for-like comparison.",
+        "Downscaled 3648x2736 -> 1632x1224 (2x2-aware binning) to stay fast."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00242
+    },
+    "latency_ms": {
+      "traditional": 201.16,
+      "hybrid": 265.76
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0202,
+      "highlights_in_range": true,
+      "p99.9_green": 0.4464,
+      "output_rb_over_g": [
+        0.907,
+        1.069
+      ],
+      "colour_vs_camera_wb_deg": 0.0,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/galaxys22ultra.jpg"
+  },
+  {
+    "file": "iphone12pro_proraw.dng",
+    "size_mb": 29.2,
+    "libraw": {
+      "raw_type": "Stack",
+      "cfa": "none (linear)",
+      "colors": 3,
+      "black_level_per_channel": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "white_level": 65535,
+      "as_shot_wb": [
+        2.2273,
+        1.0,
+        1.8489,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4032,
+        3024
+      ],
+      "flip": 6
+    },
+    "decode_ms": 897,
+    "loaded": {
+      "pattern": "linear (re-mosaiced)",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 1.0,
+      "wb_gains": [
+        2.227,
+        1.0,
+        1.849
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Linear (already demosaiced) DNG: re-mosaiced to RGGB for a like-for-like comparison.",
+        "Downscaled 4032x3024 -> 1632x1224 (2x2-aware binning) to stay fast."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00292
+    },
+    "latency_ms": {
+      "traditional": 212.35,
+      "hybrid": 274.02
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0089,
+      "highlights_in_range": true,
+      "p99.9_green": 0.7977,
+      "output_rb_over_g": [
+        0.873,
+        1.144
+      ],
+      "colour_vs_camera_wb_deg": 0.03,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0004,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/iphone12pro_proraw.jpg"
+  },
+  {
+    "file": "iphonexs.dng",
+    "size_mb": 10.3,
+    "libraw": {
+      "raw_type": "Flat",
+      "cfa": "RGGB",
+      "colors": 3,
+      "black_level_per_channel": [
+        528,
+        528,
+        528,
+        528
+      ],
+      "white_level": 4095,
+      "as_shot_wb": [
+        2.3064,
+        1.0,
+        1.938,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4032,
+        3024
+      ],
+      "flip": 0
+    },
+    "decode_ms": 364,
+    "loaded": {
+      "pattern": "RGGB",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 2.14,
+      "wb_gains": [
+        2.306,
+        1.0,
+        1.938
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Downscaled 4032x3024 -> 1632x1224 (2x2-aware binning) to stay fast.",
+        "Scene baseline exposure x2.1 (camera-style auto exposure, applied by all three pipelines)."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00085
+    },
+    "latency_ms": {
+      "traditional": 206.6,
+      "hybrid": 276.23
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0015,
+      "highlights_in_range": true,
+      "p99.9_green": 0.8049,
+      "output_rb_over_g": [
+        0.998,
+        0.908
+      ],
+      "colour_vs_camera_wb_deg": 0.05,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0097,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/iphonexs.jpg"
+  },
+  {
+    "file": "oneplus6.dng",
+    "size_mb": 32.6,
+    "libraw": {
+      "raw_type": "Flat",
+      "cfa": "RGGB",
+      "colors": 3,
+      "black_level_per_channel": [
+        63,
+        63,
+        63,
+        63
+      ],
+      "white_level": 1023,
+      "as_shot_wb": [
+        1.9468,
+        1.0,
+        1.8551,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4656,
+        3496
+      ],
+      "flip": 0
+    },
+    "decode_ms": 240,
+    "loaded": {
+      "pattern": "RGGB",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 1.0,
+      "wb_gains": [
+        1.947,
+        1.0,
+        1.855
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Downscaled 4656x3496 -> 1632x1224 (2x2-aware binning) to stay fast."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.0015
+    },
+    "latency_ms": {
+      "traditional": 202.96,
+      "hybrid": 263.63
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0027,
+      "highlights_in_range": true,
+      "p99.9_green": 0.6999,
+      "output_rb_over_g": [
+        0.772,
+        1.285
+      ],
+      "colour_vs_camera_wb_deg": 0.03,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0009,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/oneplus6.jpg"
+  },
+  {
+    "file": "pixel4a.dng",
+    "size_mb": 13.6,
+    "libraw": {
+      "raw_type": "Flat",
+      "cfa": "RGGB",
+      "colors": 3,
+      "black_level_per_channel": [
+        1023,
+        1023,
+        1022,
+        1022
+      ],
+      "white_level": 16368,
+      "as_shot_wb": [
+        2.1378,
+        1.0,
+        1.7534,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4032,
+        3024
+      ],
+      "flip": 0
+    },
+    "decode_ms": 392,
+    "loaded": {
+      "pattern": "RGGB",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 1.11,
+      "wb_gains": [
+        2.138,
+        1.0,
+        1.753
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Downscaled 4032x3024 -> 1632x1224 (2x2-aware binning) to stay fast.",
+        "Scene baseline exposure x1.1 (camera-style auto exposure, applied by all three pipelines)."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00172
+    },
+    "latency_ms": {
+      "traditional": 206.66,
+      "hybrid": 273.22
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0016,
+      "highlights_in_range": true,
+      "p99.9_green": 1.0,
+      "output_rb_over_g": [
+        1.028,
+        0.97
+      ],
+      "colour_vs_camera_wb_deg": 0.41,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0417,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/pixel4a.jpg"
+  },
+  {
+    "file": "pixel6pro.dng",
+    "size_mb": 11.9,
+    "libraw": {
+      "raw_type": "Flat",
+      "cfa": "GBRG",
+      "colors": 3,
+      "black_level_per_channel": [
+        1023,
+        1023,
+        1023,
+        1023
+      ],
+      "white_level": 16368,
+      "as_shot_wb": [
+        2.2163,
+        1.0,
+        1.4759,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4080,
+        3072
+      ],
+      "flip": 0
+    },
+    "decode_ms": 377,
+    "loaded": {
+      "pattern": "GBRG",
+      "size": [
+        1628,
+        1224
+      ],
+      "exposure": 1.83,
+      "wb_gains": [
+        2.216,
+        1.0,
+        1.476
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Downscaled 4080x3068 -> 1628x1224 (2x2-aware binning) to stay fast.",
+        "Scene baseline exposure x1.8 (camera-style auto exposure, applied by all three pipelines)."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00066
+    },
+    "latency_ms": {
+      "traditional": 204.93,
+      "hybrid": 264.99
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.0048,
+      "highlights_in_range": true,
+      "p99.9_green": 0.7477,
+      "output_rb_over_g": [
+        0.606,
+        1.248
+      ],
+      "colour_vs_camera_wb_deg": 0.04,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0136,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/pixel6pro.jpg"
+  },
+  {
+    "file": "redminote8t.dng",
+    "size_mb": 24.0,
+    "libraw": {
+      "raw_type": "Flat",
+      "cfa": "GRBG",
+      "colors": 3,
+      "black_level_per_channel": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "white_level": 1023,
+      "as_shot_wb": [
+        1.7297,
+        1.0079,
+        1.9394,
+        0.0
+      ],
+      "has_color_matrix": false,
+      "sensor_size": [
+        4000,
+        3000
+      ],
+      "flip": 0
+    },
+    "decode_ms": 180,
+    "loaded": {
+      "pattern": "GRBG",
+      "size": [
+        1632,
+        1224
+      ],
+      "exposure": 1.62,
+      "wb_gains": [
+        1.716,
+        1.0,
+        1.924
+      ],
+      "notes": [
+        "No colour matrix in file; used a generic camera matrix.",
+        "Downscaled 3996x3000 -> 1632x1224 (2x2-aware binning) to stay fast.",
+        "Scene baseline exposure x1.6 (camera-style auto exposure, applied by all three pipelines)."
+      ]
+    },
+    "route": {
+      "path": "fast",
+      "wb": "as-shot",
+      "sigma": 0.00126
+    },
+    "latency_ms": {
+      "traditional": 204.91,
+      "hybrid": 269.7
+    },
+    "checks": {
+      "black_at_zero": true,
+      "p0.1_green": 0.009,
+      "highlights_in_range": true,
+      "p99.9_green": 0.3663,
+      "output_rb_over_g": [
+        1.073,
+        0.364
+      ],
+      "colour_vs_camera_wb_deg": 0.03,
+      "colour_matches_camera_wb": true,
+      "output_clipped_share": 0.0247,
+      "not_overexposed": true
+    },
+    "passed": true,
+    "preview": "results/phone_raw/redminote8t.jpg"
+  }
+]

@@ -18,6 +18,41 @@ def estimate_sigma(img: np.ndarray) -> float:
     return float(np.median(np.abs(conv)) / (0.6745 * 6.0))
 
 
+def estimate_nlf(packed: np.ndarray, bins: int = 16) -> tuple[float, float]:
+    """Noise level function var(x) = a*x + b of a packed RAW image (Poisson-Gaussian sensor model),
+    fitted from the image itself: per intensity bin, the low percentile of the local high-pass variance
+    (flat regions only, so texture does not count as noise), then a non-negative least-squares line."""
+    g = packed[..., 1].astype(np.float32)
+    hp = cv2.filter2D(g, -1, _IMMERKAER, borderType=cv2.BORDER_REFLECT_101) / 6.0  # white noise -> std sigma
+    mu = cv2.blur(g, (7, 7))
+    var = cv2.blur(hp * hp, (7, 7))
+    sub = (slice(4, -4, 2), slice(4, -4, 2))  # drop borders, decimate for speed
+    mu, var = mu[sub].ravel(), var[sub].ravel()
+    edges = np.quantile(mu, np.linspace(0.01, 0.99, bins + 1))
+    xs, ys = [], []
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        m = (mu >= lo) & (mu < hi)
+        if m.sum() >= 200 and hi > lo:
+            xs.append(float(np.median(mu[m])))
+            ys.append(float(np.percentile(var[m], 20)) / 0.8)  # 20th pct of a ~chi2(49)/49 variable is ~0.8x its mean
+    if len(xs) < 3:
+        s = estimate_sigma(g)
+        return 0.0, s * s
+    A = np.stack([np.maximum(xs, 0), np.ones(len(xs))], axis=1)
+    a, b = np.linalg.lstsq(A, np.asarray(ys), rcond=None)[0]
+    if a < 0:  # fall back to signal-independent noise
+        a, b = 0.0, float(np.median(ys))
+    return float(max(a, 0.0)), float(max(b, 1e-10))
+
+
+def bound_residual(noisy: np.ndarray, denoised: np.ndarray, k: float, nlf: tuple[float, float] | None = None) -> np.ndarray:
+    """Trust region for a learned denoiser: never change a pixel by more than k * sigma(x), the noise std the
+    sensor's noise model allows at that brightness. Removes noise; cannot erase real detail or shift highlights."""
+    a, b = nlf if nlf is not None else estimate_nlf(noisy)
+    sigma = np.sqrt(np.maximum(a * np.maximum(denoised, 0.0) + b, 1e-12)).astype(np.float32)
+    return (noisy + np.clip(denoised - noisy, -k * sigma, k * sigma)).astype(np.float32)
+
+
 def guided_filter(img: np.ndarray, radius: int, eps: float) -> np.ndarray:
     """Self-guided filter (He et al. 2010), per channel. Fast O(N) box filters."""
     def _one(p: np.ndarray) -> np.ndarray:

@@ -199,6 +199,7 @@ def ablation(pairs, model, int8_model) -> list[dict]:
         ("No chroma cleanup", HybridOptions(chroma_cleanup=False), None),
         ("No sharpening", HybridOptions(sharpen=False), None),
         ("Bilinear instead of Malvar demosaic", HybridOptions(demosaic="bilinear"), None),
+        ("No noise-model bound on the network", HybridOptions(bound_residual=False), None),
     ]
     if int8_model is not None:
         variants.append(("INT8 learned core (instead of FP32)", HybridOptions(), int8_model))
@@ -288,6 +289,36 @@ def write_md(path: Path, usns: str, b: dict) -> None:
               "| Variant | PSNR | SSIM | ΔE |", "|---|---:|---:|---:|"]
         for a in b["ablation"]:
             L.append(f"| {a['variant']} | {a['psnr']:.2f} | {a['ssim']:.4f} | {a['delta_e']:.2f} |")
+    if b.get("efficiency_sweep"):
+        sw = b["efficiency_sweep"]
+        L += ["", "## Latency and peak memory vs resolution (CPU)", "",
+              "| RAW size | Network FP32 | Network INT8 | Traditional | Learned only | Hybrid | Hybrid peak memory |",
+              "|---|---:|---:|---:|---:|---:|---:|"]
+        for r in sw:
+            L.append(f"| {r['megapixels']} MP ({r['size']}) | {r.get('net_fp32_ms', 0):.0f} ms | {r.get('net_int8_ms', 0):.0f} ms | "
+                     f"{r['traditional_ms']:.0f} ms | {r['learned_ms']:.0f} ms | {r['hybrid_ms']:.0f} ms | {r['hybrid_mem_mb']:.0f} MB |")
+    if b.get("tiling"):
+        t = b["tiling"]
+        L += ["", f"## Tiled inference ({t['image']}): seams", "", f"_{t.get('note', '')}_", "",
+              "| Variant | Latency | PSNR vs one pass | Interior max abs diff | Interior PSNR |", "|---|---:|---:|---:|---:|"]
+        for v in t["variants"]:
+            L.append(f"| {v['variant']} | {v['latency_ms']:.0f} ms | {v['psnr_vs_single_pass']:.1f} dB | "
+                     f"{v.get('interior_max_abs_diff', 0):.2e} | {v.get('interior_psnr', 0):.1f} dB |")
+    if b.get("router"):
+        r = b["router"]
+        L += ["", f"## Adaptive router: quality vs compute ({r['n_images']} images x {', '.join(r['conditions'])})", "",
+              "| Mode | PSNR | ΔE2000 | Mean latency | Images through the network |", "|---|---:|---:|---:|---:|"]
+        for m in r["modes"]:
+            L.append(f"| {m['mode']} | {m['psnr']:.2f} | {m['delta_e']:.2f} | {m['latency_ms']:.0f} ms | {m['network_share'] * 100:.0f}% |")
+        L += ["", "Paths chosen by the adaptive router (as captured): " + "; ".join(
+            f"{k}: " + ", ".join(f"{p} {n}" for p, n in v.items()) for k, v in r["paths_by_iso_as_captured"].items())]
+    if b.get("breakdown"):
+        for title, key in (("Per phone", "by_phone"), ("Per ISO band", "by_iso")):
+            L += ["", f"## {title} (PSNR dB / ΔE2000, as captured)", "",
+                  "| Group | n | Input | Traditional | Learned only | Hybrid |", "|---|---:|---:|---:|---:|---:|"]
+            for g in b["breakdown"][key]:
+                L.append(f"| {g['group']} | {g['n']} | " + " | ".join(
+                    f"{g[p]['psnr']:.2f} / {g[p]['delta_e']:.2f}" for p in ("input", "traditional", "learned", "hybrid")) + " |")
     if b.get("failures"):
         L += ["", "## Failure cases", ""]
         for f in b["failures"]:
@@ -305,8 +336,16 @@ def main() -> int:
     ap.add_argument("--skip", default="", help="comma list of sections to skip: robustness,ablation,efficiency,failures")
     ap.add_argument("--team-id", default="TeamID")
     ap.add_argument("--usns", default="USN1, USN2, USN3, USN4")
+    ap.add_argument("--md-only", action="store_true", help="only (re)write eval_P2_<TeamID>.md from results/benchmarks.json")
+    ap.add_argument("--allow-stub", action="store_true", help="allow evaluating the classical stand-in (smoke tests only)")
     args = ap.parse_args()
     skip = set(filter(None, args.skip.split(",")))
+    if args.md_only:
+        b = json.loads((RESULTS / "benchmarks.json").read_text(encoding="utf-8"))
+        md = ROOT / f"eval_P2_{args.team_id}.md"
+        write_md(md, ", ".join(u.strip() for u in args.usns.split(",")), b)
+        print(f"wrote {md.name}")
+        return 0
 
     pairs = sorted(CACHE.glob("*.npz"))
     if not pairs:
@@ -322,6 +361,11 @@ def main() -> int:
     mpath = Path(args.manifest)
     model = model_slot.load_model(mpath)
     print(f"model: {model.info.name} ({model.info.kind}, file={model.info.file}, stub={model.is_stub})")
+    if model.is_stub and not args.allow_stub:
+        print("REFUSING: models/model.json does not load a trained network (placeholder in use"
+              + (f": {model.info.load_error}" if model.info.load_error else "") + "). "
+              "Put the exported ONNX in models/, or pass --allow-stub for a smoke test.")
+        return 2
     int8 = None
     if mpath.exists() and not model.is_stub:
         base = json.loads(mpath.read_text())
@@ -362,6 +406,16 @@ def main() -> int:
         b["ablation"] = ablation(sub, model, int8)
     if "failures" not in skip:
         b["failures"] = failures(per_image, pairs, model)
+    from extra import breakdown, efficiency_sweep, router_value, tiling_seams
+
+    b["breakdown"] = breakdown(per_image)
+    if "router" not in skip:
+        print(f"router value on {len(pairs)} images…")
+        b["router"] = router_value(pairs, model)
+    if "sweep" not in skip and not model.is_stub:
+        print("efficiency sweep…")
+        b["efficiency_sweep"] = efficiency_sweep(mpath, pairs[0])
+        b["tiling"] = tiling_seams(mpath, pairs[0])
     b["meta"] = {"subset_n": len(sub),
                  "ablation_conditions": ["as captured", "noise + 2 EV under", "white-balance error"],
                  "robustness_note": f"mean PSNR over {len(sub)} test images per level"}

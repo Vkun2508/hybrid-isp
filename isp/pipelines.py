@@ -35,6 +35,7 @@ class HybridOptions:
     chroma_cleanup: bool = True
     sharpen: bool = True
     demosaic: str = "malvar"     # "malvar" | "bilinear"
+    bound_residual: bool = True  # noise-model trust region on the network's correction
     use_model: bool = True       # False: classical denoise instead of the learned core
 
     def as_dict(self) -> dict:
@@ -241,13 +242,21 @@ def _hybrid_raw_denoiser(raw, a, route, model, opts) -> PipelineResult:
         if nmap is not None:
             st.append(Stage("Noise map", t.lap(), viz_noise(nmap), "Per-pixel sigma = sqrt(a*x+b)"))
         y = model.run(inp, nmap)
+        st.append(Stage("Learned core (RAW denoise)", t.lap(), viz_mosaic(unpack(y)),
+                        model.info.name + (" (placeholder)" if model.is_stub else "")))
+        from isp import analysis as _an
+
+        k = _an.CONFIG.residual_k if opts.bound_residual else 0.0
+        if k > 0:  # classical noise model bounds the learned correction (removes noise, never real detail)
+            nlf = denoise.estimate_nlf(inp)
+            y = denoise.bound_residual(inp, y, k, nlf)
+            st.append(Stage("Noise-model bound", t.lap(), viz_mosaic(unpack(y)),
+                            f"Correction limited to {k:g} x sigma(x), sigma^2 = {nlf[0]:.1e} x + {nlf[1]:.1e}"))
         if m.input_wb:  # undo the as-shot gains so the router's WB below is the only one applied
             g = raw.wb_gains or route.wb_gains
             y = pack(wb.apply_gains(unpack(y), (1.0 / g[0], 1.0, 1.0 / g[2])))
         bayer = unpack(y)
         resid_sigma = denoise.estimate_sigma(pack(bayer)[..., 1])  # noise left after the network
-        st.append(Stage("Learned core (RAW denoise)", t.lap(), viz_mosaic(bayer),
-                        model.info.name + (" (placeholder)" if model.is_stub else "")))
 
     # 2. Classical: router-chosen WB + exposure normalisation (after denoising, so noise isn't amplified first).
     x = wb.apply_gains(bayer, route.wb_gains) * (route.gain * raw.exposure)

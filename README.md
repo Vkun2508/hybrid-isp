@@ -20,7 +20,28 @@ decides, photo by photo, how much of the network each image needs, and the app e
 - **Results tab:** full test-set metrics, robustness curves, the ablation study and failure cases.
 
 ## Results (held-out SIDD-CC test scenes 004 and 008, 26 images, 5 phones)
-_Final numbers are written by `eval/run_eval.py` to [`results/benchmarks.json`](results/benchmarks.json) and `eval_P2_<TeamID>.md`, and shown on the site's Results tab._
+<!-- results:start -->
+> **Provisional:** measured with the classical stand-in; the trained network was not yet available.
+
+Held-out SIDD-CC test scenes 004, 008: 26 images from 5 phones, centre 1536x1024 crops, never seen in training or tuning. Model: Placeholder (classical stand-in) (`classical stand-in (no trained weights)`). Updated 2026-11-06 23:19.
+
+| Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Time / image |
+|---|---:|---:|---:|---:|---:|
+| Input (no ISP) | 25.26 | 0.5850 | 11.60 | 0.4005 | n/a |
+| Traditional ISP | 25.40 | 0.6493 | 7.73 | 0.5171 | 216 ms |
+| Learned only | 28.22 | 0.7161 | 7.73 | **0.2834** | 132 ms |
+| **Hybrid (ours)** | **29.13** | **0.7729** | **5.79** | 0.4029 | 223 ms |
+
+RAW-domain denoising by the network alone (packed RGGB vs clean RAW): **40.34 → 42.74 dB**.
+
+**Robustness** (mean PSNR over the robustness subset as each degradation grows):
+
+- **Added sensor noise** (worst level, 12800 approx. ISO): hybrid 19.49 dB, learned only 18.13 dB, traditional 14.78 dB.
+- **Under-exposure** (worst level, -4.0 EV): hybrid 27.47 dB, learned only 11.26 dB, traditional 11.29 dB.
+- **White-balance error** (worst level, 1.0 error (fraction of R/B gain)): hybrid 24.56 dB, learned only 19.25 dB, traditional 18.68 dB.
+
+Full tables, curves, the ablation study and failure cases: the website's **Results** tab, [`results/benchmarks.json`](results/benchmarks.json) and [`docs/failure_cases.md`](docs/failure_cases.md).
+<!-- results:end -->
 
 ## Run it
 
@@ -87,6 +108,11 @@ docs/           architecture.md, design.md, failure_cases.md
 
 ## Privacy and ethics
 Uploads are processed in memory and never stored, and outputs carry no metadata. The data is public: SIDD (research use) and public-domain test images. See the design doc §9.
+
+## Team Ragebaiters (T27)
+Varsha Lokesh (1RUA24CSE0515) · Thanvi Kiran Bhat (1RUA24CSE0499) · Subika Kumari (1RUA24CSE0480) · Vinochan Rajesh (1RUA24CSE0534)
+
+Evaluation report: [`eval_P2_T27.md`](eval_P2_T27.md).
 
 ## Credits
 - **SIDD:** A. Abdelhamed, S. Lin, M. S. Brown, CVPR 2018 (SIDD-CC compact release on Hugging Face, `MhdMohammadi/SIDD-CC`).

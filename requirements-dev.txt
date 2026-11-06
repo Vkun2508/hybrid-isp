@@ -12,3 +12,5 @@ tqdm
 torchinfo
 psutil
 modal            # hosting (modal_app.py)
+pytest
+httpx

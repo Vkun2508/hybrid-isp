@@ -82,7 +82,28 @@ Every decision is reported as a sentence ("why this route") in the UI. Threshold
 - Results: [`results/benchmarks.json`](../results/benchmarks.json), [`eval_P2_<TeamID>.md`](../), and the website's Results tab.
 
 ## 6. Results
-*Filled in from `results/benchmarks.json` after the final evaluation run (see README).*
+<!-- results:start -->
+> **Provisional:** measured with the classical stand-in; the trained network was not yet available.
+
+Held-out SIDD-CC test scenes 004, 008: 26 images from 5 phones, centre 1536x1024 crops, never seen in training or tuning. Model: Placeholder (classical stand-in) (`classical stand-in (no trained weights)`). Updated 2026-11-06 23:19.
+
+| Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Time / image |
+|---|---:|---:|---:|---:|---:|
+| Input (no ISP) | 25.26 | 0.5850 | 11.60 | 0.4005 | n/a |
+| Traditional ISP | 25.40 | 0.6493 | 7.73 | 0.5171 | 216 ms |
+| Learned only | 28.22 | 0.7161 | 7.73 | **0.2834** | 132 ms |
+| **Hybrid (ours)** | **29.13** | **0.7729** | **5.79** | 0.4029 | 223 ms |
+
+RAW-domain denoising by the network alone (packed RGGB vs clean RAW): **40.34 → 42.74 dB**.
+
+**Robustness** (mean PSNR over the robustness subset as each degradation grows):
+
+- **Added sensor noise** (worst level, 12800 approx. ISO): hybrid 19.49 dB, learned only 18.13 dB, traditional 14.78 dB.
+- **Under-exposure** (worst level, -4.0 EV): hybrid 27.47 dB, learned only 11.26 dB, traditional 11.29 dB.
+- **White-balance error** (worst level, 1.0 error (fraction of R/B gain)): hybrid 24.56 dB, learned only 19.25 dB, traditional 18.68 dB.
+
+Full tables, curves, the ablation study and failure cases: the website's **Results** tab, [`results/benchmarks.json`](../results/benchmarks.json) and [`docs/failure_cases.md`](failure_cases.md).
+<!-- results:end -->
 
 ## 7. Failure cases
 See [failure_cases.md](failure_cases.md), generated from the worst test images.

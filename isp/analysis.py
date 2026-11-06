@@ -11,7 +11,7 @@ import numpy as np
 
 from isp.classical.denoise import estimate_sigma
 from isp.classical.sharpen import noise_aware_amount
-from isp.classical.wb import angular_error_deg, shades_of_gray
+from isp.classical.wb import angular_error_deg, estimator_spread, shades_of_gray
 from isp.raw import RawImage, pack
 
 TARGET_MEAN = 0.16  # linear mean green of a well-exposed scene
@@ -24,12 +24,14 @@ class RouterConfig:
     """Router thresholds. Tuned on the VALIDATION scene only (eval/tune_router.py writes router_config.json)."""
     wb_angle_lo: float = 5.0     # as-shot WB trusted fully below this disagreement with shades-of-gray (degrees)
     wb_angle_hi: float = 15.0    # ... and replaced fully above this
+    wb_spread_max: float = 4.0   # if gray-world / shades-of-gray / gray-edge disagree by more, keep as-shot
     fast_sigma: float = 0.004    # visible noise below this -> fast classical path (network skipped)
     high_sigma: float = 0.03     # above this -> learned core + chroma-only cleanup
     sharpen_k: float = 0.5       # sharpening = k / (1 + sigma / sharpen_sigma0)
     sharpen_sigma0: float = 0.01
     ev_threshold: float = 0.6    # under-exposure (stops) before digital gain is applied
     local_tone_dr: float = 12.0  # dynamic range (stops) that triggers local tone mapping
+    residual_k: float = 2.0      # network may change a pixel by at most k * sigma(x) of the noise model (0 = off)
     tuned_on: str = "defaults (not tuned)"
 
 
@@ -54,6 +56,7 @@ class Analysis:
     wb_angle: float | None
     dynamic_range: float  # stops (p99.5 / p0.5 of smoothed luma)
     mean_level: float
+    wb_spread: float = 0.0  # disagreement between independent WB estimators (degrees)
 
     def as_dict(self) -> dict:
         return {k: (round(v, 5) if isinstance(v, float) else v) for k, v in asdict(self).items()}
@@ -92,10 +95,13 @@ def analyze(raw: RawImage) -> Analysis:
     clipped = float((q.max(axis=-1) >= 0.98).mean())
 
     sog = shades_of_gray(raw.bayer)
+    spread = estimator_spread(raw.bayer)
     if raw.wb_gains is not None:
         angle = angular_error_deg(raw.wb_gains, sog)
         span = max(CONFIG.wb_angle_hi - CONFIG.wb_angle_lo, 1e-6)
         wb_conf = float(np.clip(1.0 - (angle - CONFIG.wb_angle_lo) / span, 0.0, 1.0))
+        if spread > CONFIG.wb_spread_max:  # coloured scene: the estimators are unreliable, the camera is not
+            wb_conf = 1.0
     else:
         angle, wb_conf = None, 0.0
 
@@ -105,7 +111,7 @@ def analyze(raw: RawImage) -> Analysis:
     lo = max(lo, 3.0 * sigma / 4.0, 1e-4)
     dr = float(np.log2(max(hi, lo) / lo))
     return Analysis(sigma=sigma, ev=ev, clipped=clipped, wb_conf=wb_conf, wb_angle=angle,
-                    dynamic_range=dr, mean_level=mean_g)
+                    dynamic_range=dr, mean_level=mean_g, wb_spread=spread)
 
 
 def auto_exposure(bayer: np.ndarray, target: float = 0.14) -> float:
@@ -146,6 +152,10 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
     if raw.wb_gains is None:
         wb_method, wb_gains = "shades-of-gray", sog
         reasons.append("No white-balance metadata -> shades-of-gray estimate (p=6).")
+    elif a.wb_spread > CONFIG.wb_spread_max and a.wb_angle is not None and a.wb_angle > CONFIG.wb_angle_lo:
+        wb_method, wb_gains = "as-shot", raw.wb_gains
+        reasons.append(f"Scene colours are not neutral (WB estimators disagree by {a.wb_spread:.1f} deg) -> "
+                       f"trust the camera's as-shot white balance.")
     elif a.wb_conf >= 0.999:
         wb_method, wb_gains = "as-shot", raw.wb_gains
         reasons.append(f"As-shot white balance agrees with the scene ({a.wb_angle:.1f} deg) -> keep it.")

@@ -40,6 +40,7 @@ GRID = {
     "fast_sigma": [0.002, 0.004, 0.008, 0.016],
     "high_sigma": [0.02, 0.03, 0.05],
     "ev_threshold": [0.4, 0.6, 1.0],
+    "residual_k": [0.0, 1.5, 2.0, 3.0],  # 0 = no trust region
 }
 
 
