@@ -8,10 +8,12 @@ const SERIES_COLOUR: Record<string, string> = {
 const SERIES_NAME: Record<string, string> = { hybrid: "Hybrid", learned: "Learned only", traditional: "Traditional", input: "Input" };
 
 function LineChart({ x, xLabel, series }: { x: number[]; xLabel: string; series: { pipeline: string; psnr: number[] }[] }) {
-  const W = 640, H = 220, L = 40, R = 12, T = 12, B = 34;
+  const W = 380, H = 230, L = 34, R = 10, T = 10, B = 34;
   const all = series.flatMap((s) => s.psnr).filter(Number.isFinite);
-  const lo = Math.floor(Math.min(...all) / 2) * 2, hi = Math.ceil(Math.max(...all) / 2) * 2;
-  const ticks = Array.from({ length: 5 }, (_, i) => lo + ((hi - lo) * i) / 4);
+  const span = Math.max(...all) - Math.min(...all);
+  const step = [1, 2, 2.5, 5, 10].find((s) => span / s <= 5) ?? 10;
+  const lo = Math.floor(Math.min(...all) / step) * step, hi = Math.ceil(Math.max(...all) / step) * step;
+  const ticks = Array.from({ length: Math.round((hi - lo) / step) + 1 }, (_, i) => lo + i * step);
   const px = (i: number) => L + (i * (W - L - R)) / Math.max(1, x.length - 1);
   const py = (v: number) => T + (1 - (v - lo) / Math.max(1e-6, hi - lo)) * (H - T - B);
   return (
@@ -19,7 +21,7 @@ function LineChart({ x, xLabel, series }: { x: number[]; xLabel: string; series:
       {ticks.map((t) => (
         <g key={t}>
           <line className="gridline" x1={L} x2={W - R} y1={py(t)} y2={py(t)} />
-          <text x={L - 8} y={py(t) + 4} textAnchor="end">{t.toFixed(0)}</text>
+          <text x={L - 8} y={py(t) + 4} textAnchor="end">{Number.isInteger(t) ? t : t.toFixed(1)}</text>
         </g>
       ))}
       {x.map((v, i) => <text key={i} x={px(i)} y={H - 14} textAnchor="middle">{v}</text>)}
@@ -60,7 +62,22 @@ export function Results() {
       </main>
     );
 
-  const pending = !b || b.status === "pending";
+  const pending = b !== null && b.status === "pending";
+  if (b === null)
+    return (
+      <main className="results" aria-busy="true">
+        <div>
+          <h1>Results on held-out test scenes</h1>
+          <div className="skel" style={{ height: 14, width: 360, maxWidth: "100%", marginTop: 10 }} />
+        </div>
+        {[180, 260, 220].map((h, i) => (
+          <section className="card" key={i} aria-hidden="true">
+            <div className="skel" style={{ height: 16, width: 140, marginBottom: 16 }} />
+            <div className="skel" style={{ height: h }} />
+          </section>
+        ))}
+      </main>
+    );
   return (
     <main className="results">
       <div>
@@ -92,8 +109,8 @@ export function Results() {
         <section className="card pending" role="note">
           <span className="pill warning" style={{ justifySelf: "start" }}><span className="dot" /> Provisional numbers</span>
           <p className="secondary">
-            Measured with the classical stand-in in place of the trained network ({b.model?.variant}). The learned core is
-            still training; these tables are recomputed on the same test scenes when it finishes.
+            Measured with a classical stand-in in place of the trained network, which is still training. Every table is
+            recomputed on the same test scenes when it finishes.
           </p>
         </section>
       )}
@@ -126,7 +143,7 @@ export function Results() {
       )}
 
       {b?.robustness && b.robustness.length > 0 && (
-        <div className="grid2">
+        <div className={b.robustness.length === 3 ? "grid3" : "grid2"}>
           {b.robustness.map((rb) => (
             <section className="card" key={rb.title}>
               <div className="card-head"><h2>{rb.title}</h2><Legend keys={rb.series.map((s) => s.pipeline)} /></div>
@@ -136,7 +153,17 @@ export function Results() {
         </div>
       )}
 
-      {b?.efficiency && (
+      {b?.efficiency && b.efficiency.length === 0 && (
+        <section className="card">
+          <div className="card-head"><h2>Efficiency</h2><p>CPU, one 1-megapixel RAW frame</p></div>
+          <p className="secondary">
+            Model size, latency and memory for the FP32 and INT8 network are measured once the trained model is exported.
+            The classical stand-in has no weights to measure.
+          </p>
+        </section>
+      )}
+
+      {b?.efficiency && b.efficiency.length > 0 && (
         <section className="card">
           <div className="card-head"><h2>Efficiency</h2><p>CPU, one 1-megapixel RAW frame</p></div>
           <div className="grid2">
@@ -161,7 +188,13 @@ export function Results() {
 
       {b?.ablation && (
         <section className="card">
-          <div className="card-head"><h2>Ablation</h2><p>The hybrid with one part removed at a time</p></div>
+          <div className="card-head">
+            <h2>Ablation</h2>
+            <p>
+              The hybrid with one part removed at a time
+              {b.meta ? ` · ${b.meta.subset_n} test images × ${b.meta.ablation_conditions.join(", ")}` : ""}
+            </p>
+          </div>
           <table className="table">
             <thead><tr><th>Variant</th><th className="num">PSNR</th><th className="num">SSIM</th><th className="num">ΔE</th></tr></thead>
             <tbody>
@@ -184,7 +217,8 @@ export function Results() {
           <div className="gallery">
             {b.failures.map((f) => (
               <figure key={f.title}>
-                {f.image_url && <img src={f.image_url} alt={f.title} loading="lazy" />}
+                {f.image_url && <img src={f.image_url} alt={`${f.title}: input, hybrid output and ground truth`} loading="eager" />}
+                <div className="strip-labels small muted" aria-hidden="true"><span>Input</span><span>Hybrid</span><span>Ground truth</span></div>
                 <h3 style={{ marginTop: 8 }}>{f.title}</h3>
                 <p className="small muted" style={{ marginTop: 2 }}>{f.description}</p>
               </figure>

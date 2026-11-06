@@ -362,6 +362,9 @@ def main() -> int:
         b["ablation"] = ablation(sub, model, int8)
     if "failures" not in skip:
         b["failures"] = failures(per_image, pairs, model)
+    b["meta"] = {"subset_n": len(sub),
+                 "ablation_conditions": ["as captured", "noise + 2 EV under", "white-balance error"],
+                 "robustness_note": f"mean PSNR over {len(sub)} test images per level"}
     b["per_image"] = per_image
 
     RESULTS.mkdir(exist_ok=True)

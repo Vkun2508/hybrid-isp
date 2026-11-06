@@ -53,6 +53,7 @@ export interface Benchmarks {
   robustness?: { title: string; x_label: string; x: number[]; series: { pipeline: string; psnr: number[] }[] }[];
   ablation?: { variant: string; psnr: number; ssim: number; delta_e: number; note?: string }[];
   failures?: { title: string; description: string; image_url?: string }[];
+  meta?: { subset_n: number; ablation_conditions: string[]; robustness_note: string };
 }
 
 export class ApiError extends Error {

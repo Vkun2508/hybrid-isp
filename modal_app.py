@@ -27,7 +27,8 @@ image = (
 app = modal.App("hybrid-isp", image=image)
 
 
-@app.function(cpu=4.0, memory=4096, min_containers=1, max_containers=1, timeout=120, scaledown_window=1200)
+# 2 cores / 3 GB kept warm (~$0.12/h): fits Modal's free monthly credit through judging day.
+@app.function(cpu=2.0, memory=3072, min_containers=1, max_containers=1, timeout=120, scaledown_window=1200)
 @modal.concurrent(max_inputs=16)
 @modal.asgi_app()
 def web():

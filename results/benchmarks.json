@@ -1089,5 +1089,14 @@
         "lpips": 0.6728323698043823
       }
     }
-  ]
+  ],
+  "meta": {
+    "subset_n": 8,
+    "ablation_conditions": [
+      "as captured",
+      "noise + 2 EV under",
+      "white-balance error"
+    ],
+    "robustness_note": "mean PSNR over 8 test images per level"
+  }
 }
