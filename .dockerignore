@@ -1,0 +1,14 @@
+.venv
+.git
+.cache
+**/__pycache__
+web/node_modules
+web/dist
+graphify-out
+training
+eval
+scripts
+docs
+*.zip
+*.pth
+CONTEXT.md

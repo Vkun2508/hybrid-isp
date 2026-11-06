@@ -1,0 +1,473 @@
+{
+  "status": "provisional",
+  "updated": "2026-11-06 21:59",
+  "model": {
+    "name": "Placeholder (classical stand-in)",
+    "params": 0,
+    "variant": "classical stand-in (no trained weights)"
+  },
+  "dataset": {
+    "name": "SIDD-CC smartphone RAW",
+    "test_scenes": [
+      "004",
+      "008"
+    ],
+    "n_images": 6,
+    "note": "scene-level hold-out, 5 phones, one noisy/clean pair per test instance",
+    "crop": "centre 1536x1024"
+  },
+  "machine": "16 logical CPUs, ONNX Runtime CPU",
+  "quality": [
+    {
+      "pipeline": "input",
+      "psnr": 29.2,
+      "ssim": 0.619,
+      "delta_e": 8.505,
+      "lpips": 0.4061
+    },
+    {
+      "pipeline": "traditional",
+      "psnr": 29.535,
+      "ssim": 0.6789,
+      "delta_e": 5.398,
+      "lpips": 0.4662
+    },
+    {
+      "pipeline": "learned",
+      "psnr": 32.803,
+      "ssim": 0.7921,
+      "delta_e": 4.848,
+      "lpips": 0.2322
+    },
+    {
+      "pipeline": "hybrid",
+      "psnr": 32.198,
+      "ssim": 0.7752,
+      "delta_e": 3.732,
+      "lpips": 0.3911
+    }
+  ],
+  "extra": {
+    "latency_ms_per_image": {
+      "traditional": 196.2,
+      "learned": 119.3,
+      "hybrid": 211.9
+    },
+    "peak_rss_mb": 909.6,
+    "raw_domain_psnr": {
+      "noisy": 37.482,
+      "denoised": 39.246
+    }
+  },
+  "efficiency": [],
+  "robustness": [
+    {
+      "title": "Added sensor noise",
+      "x_label": "approx. ISO",
+      "x": [
+        100,
+        336,
+        1131,
+        3805,
+        12800
+      ],
+      "series": [
+        {
+          "pipeline": "traditional",
+          "psnr": [
+            31.171,
+            29.95,
+            27.893,
+            24.265,
+            19.096
+          ]
+        },
+        {
+          "pipeline": "learned",
+          "psnr": [
+            34.227,
+            33.306,
+            31.854,
+            29.009,
+            23.863
+          ]
+        },
+        {
+          "pipeline": "hybrid",
+          "psnr": [
+            33.29,
+            32.323,
+            30.018,
+            25.628,
+            23.052
+          ]
+        }
+      ],
+      "router_off": [
+        32.849,
+        31.9,
+        29.634,
+        25.304,
+        21.442
+      ]
+    },
+    {
+      "title": "Under-exposure",
+      "x_label": "EV",
+      "x": [
+        0.0,
+        -1.0,
+        -2.0,
+        -3.0,
+        -4.0
+      ],
+      "series": [
+        {
+          "pipeline": "traditional",
+          "psnr": [
+            31.171,
+            19.287,
+            14.949,
+            12.915,
+            11.851
+          ]
+        },
+        {
+          "pipeline": "learned",
+          "psnr": [
+            34.227,
+            19.401,
+            14.949,
+            12.905,
+            11.843
+          ]
+        },
+        {
+          "pipeline": "hybrid",
+          "psnr": [
+            33.29,
+            20.361,
+            20.361,
+            20.361,
+            20.361
+          ]
+        }
+      ],
+      "router_off": [
+        32.849,
+        20.341,
+        20.341,
+        20.341,
+        20.341
+      ]
+    },
+    {
+      "title": "White-balance error",
+      "x_label": "error (fraction of R/B gain)",
+      "x": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "series": [
+        {
+          "pipeline": "traditional",
+          "psnr": [
+            31.171,
+            28.669,
+            25.403,
+            22.716,
+            20.461
+          ]
+        },
+        {
+          "pipeline": "learned",
+          "psnr": [
+            34.227,
+            30.484,
+            26.337,
+            23.191,
+            20.702
+          ]
+        },
+        {
+          "pipeline": "hybrid",
+          "psnr": [
+            33.29,
+            30.343,
+            27.601,
+            26.745,
+            27.577
+          ]
+        }
+      ],
+      "router_off": [
+        32.849,
+        30.083,
+        27.448,
+        26.619,
+        27.43
+      ]
+    }
+  ],
+  "ablation": [
+    {
+      "variant": "Full hybrid",
+      "psnr": 26.769,
+      "ssim": 0.7257,
+      "delta_e": 8.171
+    },
+    {
+      "variant": "No learned core (classical denoise)",
+      "psnr": 26.58,
+      "ssim": 0.7268,
+      "delta_e": 8.425
+    },
+    {
+      "variant": "No router (always network, fixed sharpening)",
+      "psnr": 26.556,
+      "ssim": 0.7126,
+      "delta_e": 8.188
+    },
+    {
+      "variant": "No white-balance correction",
+      "psnr": 28.583,
+      "ssim": 0.7426,
+      "delta_e": 5.561
+    },
+    {
+      "variant": "No exposure normalisation",
+      "psnr": 24.639,
+      "ssim": 0.6326,
+      "delta_e": 8.869
+    },
+    {
+      "variant": "No chroma cleanup",
+      "psnr": 26.769,
+      "ssim": 0.7257,
+      "delta_e": 8.171
+    },
+    {
+      "variant": "No sharpening",
+      "psnr": 27.405,
+      "ssim": 0.7514,
+      "delta_e": 8.122
+    },
+    {
+      "variant": "Bilinear instead of Malvar demosaic",
+      "psnr": 27.302,
+      "ssim": 0.7457,
+      "delta_e": 8.399
+    }
+  ],
+  "failures": [
+    {
+      "title": "N6 \u00b7 ISO 3200 \u00b7 scene 004",
+      "description": "Input | Hybrid | Ground truth (centre crop). Hybrid 24.50 dB vs traditional 18.42 dB, dE 7.95; router chose 'learned_chroma'.",
+      "image_url": "/api/results-files/failures/0076_004_N6_03200_00320_3200_L.jpg",
+      "instance": "0076_004_N6_03200_00320_3200_L"
+    },
+    {
+      "title": "N6 \u00b7 ISO 800 \u00b7 scene 004",
+      "description": "Input | Hybrid | Ground truth (centre crop). Hybrid 29.26 dB vs traditional 25.52 dB, dE 5.41; router chose 'learned'.",
+      "image_url": "/api/results-files/failures/0075_004_N6_00800_00080_3200_L.jpg",
+      "instance": "0075_004_N6_00800_00080_3200_L"
+    },
+    {
+      "title": "G4 \u00b7 ISO 200 \u00b7 scene 004",
+      "description": "Input | Hybrid | Ground truth (centre crop). Hybrid 33.46 dB vs traditional 31.74 dB, dE 2.85; router chose 'learned'.",
+      "image_url": "/api/results-files/failures/0078_004_G4_00200_00050_3200_N.jpg",
+      "instance": "0078_004_G4_00200_00050_3200_N"
+    }
+  ],
+  "per_image": [
+    {
+      "instance": "0075_004_N6_00800_00080_3200_L",
+      "scene": "004",
+      "camera": "N6",
+      "iso": 800,
+      "route": "learned",
+      "input": {
+        "psnr": 24.533363467308185,
+        "ssim": 0.36820932229359943,
+        "delta_e": 11.930159568786621,
+        "lpips": 0.6840329170227051
+      },
+      "traditional": {
+        "psnr": 25.51940923566528,
+        "ssim": 0.45513137181599933,
+        "delta_e": 7.37952184677124,
+        "lpips": 0.7767935395240784
+      },
+      "learned": {
+        "psnr": 30.397109882489268,
+        "ssim": 0.7201035221417745,
+        "delta_e": 6.117992401123047,
+        "lpips": 0.3523228168487549
+      },
+      "hybrid": {
+        "psnr": 29.25635265568774,
+        "ssim": 0.6622951428095499,
+        "delta_e": 5.407321929931641,
+        "lpips": 0.6346974968910217
+      }
+    },
+    {
+      "instance": "0076_004_N6_03200_00320_3200_L",
+      "scene": "004",
+      "camera": "N6",
+      "iso": 3200,
+      "route": "learned_chroma",
+      "input": {
+        "psnr": 16.977961989811856,
+        "ssim": 0.12528777743379274,
+        "delta_e": 20.87434196472168,
+        "lpips": 0.7594832181930542
+      },
+      "traditional": {
+        "psnr": 18.41794819895644,
+        "ssim": 0.17147510995467505,
+        "delta_e": 15.024094581604004,
+        "lpips": 0.9042410850524902
+      },
+      "learned": {
+        "psnr": 23.650165695906434,
+        "ssim": 0.3591519097487132,
+        "delta_e": 12.074104309082031,
+        "lpips": 0.5125203728675842
+      },
+      "hybrid": {
+        "psnr": 24.49741935061364,
+        "ssim": 0.3415304770072301,
+        "delta_e": 7.952517986297607,
+        "lpips": 0.7294241189956665
+      }
+    },
+    {
+      "instance": "0077_004_G4_00100_00025_3200_N",
+      "scene": "004",
+      "camera": "G4",
+      "iso": 100,
+      "route": "learned",
+      "input": {
+        "psnr": 32.90338696476808,
+        "ssim": 0.7934358716011047,
+        "delta_e": 4.847904682159424,
+        "lpips": 0.2669272720813751
+      },
+      "traditional": {
+        "psnr": 32.9119895972714,
+        "ssim": 0.8673707842826843,
+        "delta_e": 2.56877064704895,
+        "lpips": 0.2960507273674011
+      },
+      "learned": {
+        "psnr": 35.31298942774828,
+        "ssim": 0.918608824412028,
+        "delta_e": 2.871457099914551,
+        "lpips": 0.12582841515541077
+      },
+      "hybrid": {
+        "psnr": 34.21920630314497,
+        "ssim": 0.9132797122001648,
+        "delta_e": 2.3480770587921143,
+        "lpips": 0.27189022302627563
+      }
+    },
+    {
+      "instance": "0078_004_G4_00200_00050_3200_N",
+      "scene": "004",
+      "camera": "G4",
+      "iso": 200,
+      "route": "learned",
+      "input": {
+        "psnr": 30.88360468139858,
+        "ssim": 0.6977090636889139,
+        "delta_e": 6.182331085205078,
+        "lpips": 0.36383727192878723
+      },
+      "traditional": {
+        "psnr": 31.743297481534256,
+        "ssim": 0.8040482799212137,
+        "delta_e": 3.2873198986053467,
+        "lpips": 0.37424057722091675
+      },
+      "learned": {
+        "psnr": 34.20644953486713,
+        "ssim": 0.8870476086934408,
+        "delta_e": 3.398845672607422,
+        "lpips": 0.16639378666877747
+      },
+      "hybrid": {
+        "psnr": 33.455337657767224,
+        "ssim": 0.8767697215080261,
+        "delta_e": 2.847186326980591,
+        "lpips": 0.33072584867477417
+      }
+    },
+    {
+      "instance": "0083_004_GP_00050_00020_4400_N",
+      "scene": "004",
+      "camera": "GP",
+      "iso": 50,
+      "route": "fast",
+      "input": {
+        "psnr": 36.17424306922662,
+        "ssim": 0.911753257115682,
+        "delta_e": 2.8832294940948486,
+        "lpips": 0.10596851259469986
+      },
+      "traditional": {
+        "psnr": 35.081740319577015,
+        "ssim": 0.9206486543019613,
+        "delta_e": 1.6838111877441406,
+        "lpips": 0.15602321922779083
+      },
+      "learned": {
+        "psnr": 36.969588178142345,
+        "ssim": 0.9440131386121114,
+        "delta_e": 2.077521562576294,
+        "lpips": 0.09743522852659225
+      },
+      "hybrid": {
+        "psnr": 36.39577983924244,
+        "ssim": 0.9441625475883484,
+        "delta_e": 1.7083131074905396,
+        "lpips": 0.11632712930440903
+      }
+    },
+    {
+      "instance": "0084_004_GP_00200_00100_4400_N",
+      "scene": "004",
+      "camera": "GP",
+      "iso": 200,
+      "route": "learned",
+      "input": {
+        "psnr": 33.72758259962523,
+        "ssim": 0.817689061164856,
+        "delta_e": 4.311357021331787,
+        "lpips": 0.2563060224056244
+      },
+      "traditional": {
+        "psnr": 33.53453875247785,
+        "ssim": 0.8547027905782064,
+        "delta_e": 2.4451940059661865,
+        "lpips": 0.2899729013442993
+      },
+      "learned": {
+        "psnr": 36.28272338638664,
+        "ssim": 0.9235052267710367,
+        "delta_e": 2.549346446990967,
+        "lpips": 0.13846291601657867
+      },
+      "hybrid": {
+        "psnr": 35.365658904057135,
+        "ssim": 0.9132151007652283,
+        "delta_e": 2.1293017864227295,
+        "lpips": 0.26380160450935364
+      }
+    }
+  ]
+}

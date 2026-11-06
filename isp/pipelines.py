@@ -272,7 +272,10 @@ def _hybrid_raw_denoiser(raw, a, route, model, opts) -> PipelineResult:
         st.append(Stage("Chroma cleanup", t.lap(), viz_srgb(out), f"Bilateral on Cr/Cb, strength {route.chroma:.2f}"))
 
     # 5. Noise-aware sharpening on what's left after denoising (scaled by the gain).
-    amount = route.sharpen if not opts.router else sharpen.noise_aware_amount(resid_sigma * route.gain * raw.exposure)
+    from isp import analysis as _an
+
+    amount = route.sharpen if not opts.router else sharpen.noise_aware_amount(
+        resid_sigma * route.gain * raw.exposure, _an.CONFIG.sharpen_k, _an.CONFIG.sharpen_sigma0)
     if opts.sharpen and amount > 0:
         out = sharpen.unsharp_luma(out, amount)
     st.append(Stage("Sharpen", t.lap(), viz_srgb(out), f"Noise-aware amount {amount if opts.sharpen else 0:.2f}"))

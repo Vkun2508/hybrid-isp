@@ -1,0 +1,13 @@
+# Runtime (the web app / Docker image). No PyTorch: the learned core runs through ONNX Runtime.
+numpy==2.5.4
+scipy==1.18.1
+opencv-python-headless==5.0.0.93
+rawpy==0.28.0
+scikit-image==0.26.0
+onnxruntime==1.31.1
+onnx==1.23.2
+fastapi==0.162.0
+starlette==1.10.0
+pydantic==2.14.3
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33

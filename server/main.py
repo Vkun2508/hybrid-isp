@@ -320,8 +320,20 @@ def result_image(rid: str, name: str):
 @app.get("/api/benchmarks")
 def benchmarks():
     if RESULTS_JSON.exists():
-        return JSONResponse(json.loads(RESULTS_JSON.read_text(encoding="utf-8")))
+        data = json.loads(RESULTS_JSON.read_text(encoding="utf-8"))
+        data.pop("per_image", None)  # large; kept in the file for the report, not needed by the UI
+        return JSONResponse(data)
     return JSONResponse({"status": "pending", "message": "Evaluation results have not been generated yet."})
+
+
+@app.get("/api/results-files/{path:path}", include_in_schema=False)
+def results_file(path: str):
+    """Read-only access to images under results/ (failure-case pictures)."""
+    base = RESULTS_JSON.parent.resolve()
+    f = (base / path).resolve()
+    if base not in f.parents or not f.is_file() or f.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
+        raise InputError("not_found", "That file doesn't exist.", "", 404)
+    return FileResponse(f, headers={"Cache-Control": "public, max-age=3600"})
 
 
 # --------------------------------------------------------------------------- warm-up + static site

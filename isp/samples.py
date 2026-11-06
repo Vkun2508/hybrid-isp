@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
+from isp.analysis import auto_exposure
 from isp.io import InputError, load_image
 from isp.raw import RawImage
 
@@ -40,7 +41,7 @@ def _load_cached(sample_id: str) -> RawImage:
         z = np.load(path)
         raw = RawImage(
             bayer=z["noisy"].astype(np.float32), wb_gains=tuple(float(v) for v in z["wb_gains"]),
-            cam2rgb=z["cam2rgb"].astype(np.float32), exposure=float(z["exposure"]),
+            cam2rgb=z["cam2rgb"].astype(np.float32), exposure=auto_exposure(z["gt"].astype(np.float32)),
             meta={"source": "sidd", "filename": e["file"], "pattern": "RGGB (SIDD, aligned)",
                   "orig_size": [int(z["noisy"].shape[1]), int(z["noisy"].shape[0])],
                   "notes": [f"Real smartphone RAW ({e['source']['camera']}, ISO {e['source']['iso']}) from an unseen "

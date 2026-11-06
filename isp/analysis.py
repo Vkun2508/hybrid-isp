@@ -1,8 +1,10 @@
 """Image analyser + adaptive router: decides how much of the network each photo needs, and why."""
 from __future__ import annotations
 
+import json
 import os
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -12,10 +14,35 @@ from isp.classical.sharpen import noise_aware_amount
 from isp.classical.wb import angular_error_deg, shades_of_gray
 from isp.raw import RawImage, pack
 
-TARGET_MEAN = 0.16                                                    # linear mean green of a well-exposed scene
-FAST_SIGMA = float(os.environ.get("ISP_ROUTER_FAST_SIGMA", "0.004"))  # below: classical fast path
-HIGH_SIGMA = float(os.environ.get("ISP_ROUTER_HIGH_SIGMA", "0.03"))   # above: network + chroma cleanup
+TARGET_MEAN = 0.16  # linear mean green of a well-exposed scene
 MAX_GAIN = 16.0
+CONFIG_PATH = Path(os.environ.get("ISP_ROUTER_CONFIG", Path(__file__).with_name("router_config.json")))
+
+
+@dataclass
+class RouterConfig:
+    """Router thresholds. Tuned on the VALIDATION scene only (eval/tune_router.py writes router_config.json)."""
+    wb_angle_lo: float = 5.0     # as-shot WB trusted fully below this disagreement with shades-of-gray (degrees)
+    wb_angle_hi: float = 15.0    # ... and replaced fully above this
+    fast_sigma: float = 0.004    # visible noise below this -> fast classical path (network skipped)
+    high_sigma: float = 0.03     # above this -> learned core + chroma-only cleanup
+    sharpen_k: float = 0.5       # sharpening = k / (1 + sigma / sharpen_sigma0)
+    sharpen_sigma0: float = 0.01
+    ev_threshold: float = 0.6    # under-exposure (stops) before digital gain is applied
+    local_tone_dr: float = 12.0  # dynamic range (stops) that triggers local tone mapping
+    tuned_on: str = "defaults (not tuned)"
+
+
+def load_config(path: Path = CONFIG_PATH) -> RouterConfig:
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return RouterConfig()
+    known = {f.name for f in fields(RouterConfig)}
+    return RouterConfig(**{k: v for k, v in raw.items() if k in known})
+
+
+CONFIG = load_config()
 
 
 @dataclass
@@ -67,7 +94,8 @@ def analyze(raw: RawImage) -> Analysis:
     sog = shades_of_gray(raw.bayer)
     if raw.wb_gains is not None:
         angle = angular_error_deg(raw.wb_gains, sog)
-        wb_conf = float(np.clip(1.0 - (angle - 5.0) / 10.0, 0.0, 1.0))
+        span = max(CONFIG.wb_angle_hi - CONFIG.wb_angle_lo, 1e-6)
+        wb_conf = float(np.clip(1.0 - (angle - CONFIG.wb_angle_lo) / span, 0.0, 1.0))
     else:
         angle, wb_conf = None, 0.0
 
@@ -82,10 +110,13 @@ def analyze(raw: RawImage) -> Analysis:
 
 def auto_exposure(bayer: np.ndarray, target: float = 0.14) -> float:
     """Scene baseline exposure for real RAW (what a camera's AE would pick): bring the mean green to
-    `target` without pushing more than ~1% of pixels past white. Clamped to [1, 16]."""
+    `target` without pushing more than ~1% of pixels past white. Statistics come from 4x4-binned
+    green, so sensor noise does not inflate the highlight percentile. Clamped to [1, 16]."""
     q = pack(bayer)
-    g = np.maximum(0.5 * (q[..., 1] + q[..., 2]), 0)
-    mean, p99 = float(g.mean()), float(np.percentile(g[::2, ::2], 99))
+    g = 0.5 * (q[..., 1] + q[..., 2])
+    small = cv2.resize(g, (max(1, g.shape[1] // 4), max(1, g.shape[0] // 4)), interpolation=cv2.INTER_AREA)
+    small = np.maximum(small, 0)
+    mean, p99 = float(small.mean()), float(np.percentile(small, 99))
     e = min(target / max(mean, 1e-5), 1.0 / max(p99, 1e-5))
     return float(np.clip(e, 1.0, 16.0))
 
@@ -102,7 +133,8 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
     reasons: list[str] = []
 
     # Exposure
-    if a.ev < -0.6:
+    cfg = CONFIG
+    if a.ev < -cfg.ev_threshold:
         gain = float(min(2.0 ** (-a.ev), MAX_GAIN))  # = the scene AE's extra gain
         reasons.append(f"Under-exposed by {-a.ev:.1f} EV -> digital gain x{gain:.1f} before the network (noise map scaled to match).")
     else:
@@ -129,21 +161,21 @@ def decide(raw: RawImage, a: Analysis, force_path: str | None = None) -> Route:
     if force_path:
         path, forced = force_path, True
         reasons.append(f"Router override: path forced to '{force_path}'.")
-    elif sigma_eff < FAST_SIGMA:
+    elif sigma_eff < cfg.fast_sigma:
         path, forced = "fast", False
-        reasons.append(f"Noise sigma={sigma_eff:.4f} < {FAST_SIGMA} -> fast classical path (network skipped).")
-    elif sigma_eff < HIGH_SIGMA:
+        reasons.append(f"Noise sigma={sigma_eff:.4f} < {cfg.fast_sigma} -> fast classical path (network skipped).")
+    elif sigma_eff < cfg.high_sigma:
         path, forced = "learned", False
         reasons.append(f"Noise sigma={sigma_eff:.4f} -> learned core.")
     else:
         path, forced = "learned_chroma", False
-        reasons.append(f"High noise sigma={sigma_eff:.4f} >= {HIGH_SIGMA} -> learned core + chroma-only cleanup, weaker sharpening.")
+        reasons.append(f"High noise sigma={sigma_eff:.4f} >= {cfg.high_sigma} -> learned core + chroma-only cleanup, weaker sharpening.")
 
-    chroma = float(np.clip((sigma_eff - HIGH_SIGMA) / HIGH_SIGMA + 0.5, 0.0, 1.0)) if path == "learned_chroma" else 0.0
-    sharpen = noise_aware_amount(sigma_eff)
-    reasons.append(f"Sharpening = 0.5 / (1 + sigma/0.01) = {sharpen:.2f}.")
+    chroma = float(np.clip((sigma_eff - cfg.high_sigma) / cfg.high_sigma + 0.5, 0.0, 1.0)) if path == "learned_chroma" else 0.0
+    sharpen = noise_aware_amount(sigma_eff, cfg.sharpen_k, cfg.sharpen_sigma0)
+    reasons.append(f"Sharpening = {cfg.sharpen_k:g} / (1 + sigma/{cfg.sharpen_sigma0:g}) = {sharpen:.2f}.")
 
-    local = a.dynamic_range > 12.0 and gain < 4
+    local = a.dynamic_range > cfg.local_tone_dr and gain < 4
     if local:
         reasons.append(f"High dynamic range ({a.dynamic_range:.1f} stops) -> local tone mapping.")
 

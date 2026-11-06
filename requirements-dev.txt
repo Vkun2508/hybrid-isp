@@ -1,0 +1,13 @@
+# Development, export and evaluation (not in the Docker image)
+-r requirements.txt
+torch            # CPU build is enough: pip install torch --index-url https://download.pytorch.org/whl/cpu
+onnxscript
+lpips            # LPIPS (AlexNet) for eval/run_eval.py
+huggingface_hub  # SIDD-CC sample/test downloads, Space deploy
+nbconvert
+ipykernel
+pandas
+matplotlib
+tqdm
+torchinfo
+psutil
