@@ -114,7 +114,7 @@ REQUIRE_GPU                = True   # Stop early with instructions if no GPU is 
 PATCH_SIZE    = 128    # Bayer-packed patch size (H/2, W/2) -> corresponds to 256x256 in raw mosaic
 BATCH_SIZE    = 16     # Mini-batch size (T4 has room; was 8)
 NUM_EPOCHS    = 60     # Maximum training epochs (time cap below stops earlier if needed)
-LEARNING_RATE = 2e-4   # AdamW learning rate
+LEARNING_RATE = 1e-4   # AdamW learning rate (2e-4 diverged at epoch 13 in run 1)
 WEIGHT_DECAY  = 1e-4   # AdamW weight decay
 GRAD_CLIP     = 1.0    # Max gradient norm for clipping
 PATIENCE      = 10     # Early stopping patience on validation PSNR
@@ -276,6 +276,18 @@ replace(C_TRAIN, '''        # Check early stopping
 
         # Check early stopping
         if patience_counter >= PATIENCE:''')
+
+replace(C_TRAIN, """        with torch.amp.autocast(device_type=device.type, enabled=use_amp):
+            pred = model(noisy)
+            loss, l_char, l_ssim = criterion(pred, gt)
+""", """        with torch.amp.autocast(device_type=device.type, enabled=use_amp):
+            pred = model(noisy)
+        # Loss in float32: the SSIM terms are fragile in float16 (run 1 diverged at epoch 13 under AMP).
+        loss, l_char, l_ssim = criterion(pred.float(), gt.float())
+        if not torch.isfinite(loss):  # never step on a broken batch
+            optimizer.zero_grad(set_to_none=True)
+            continue
+""")
 
 # ----------------------------------------------------------------------------- test evaluation -> results
 replace(C_TEST, '''    results = evaluate_test_set(eval_model, test_loader, criterion, DEVICE)
@@ -570,7 +582,7 @@ if EXPORT_DIR.exists() and any(EXPORT_DIR.iterdir()):
 else:
     print("Nothing exported yet (training did not produce a checkpoint).")
 '''
-CHANGES_MD = '''> **Changes in this version (for the web-app integration)**: cloud-GPU defaults (Kaggle/Colab, all 10 scenes, 2 held-out test scenes, 5 h time cap, resume), no torch reinstall (keeps the platform's CUDA build), fixed `compute_ssim` (was undefined, crashed test evaluation), fixed export `torch.load(weights_only=False)` (crashed on torch >= 2.6), exported `unet_isp.py` is now the exact trained architecture (it was a different 3-level network that could not load the weights), tiled-inference reflect-pad crash on small inputs fixed (and benchmarks can no longer block the export), per-worker DataLoader RNG (workers were repeating crops), correct `ColorMatrix2` inversion in the sRGB render, test results passed into `training_results.json`, new Section 17b (ONNX FP32 + INT8 + efficiency table + `model.json` for the app), and a final zip of `exported_model/`. Set `ISP_NB_QUICK=1` for a tiny CPU dry run.
+CHANGES_MD = '''> **Changes in this version (for the web-app integration)**: cloud-GPU defaults (Kaggle/Colab, all 10 scenes, 2 held-out test scenes, 5 h time cap, resume), no torch reinstall (keeps the platform's CUDA build), fixed `compute_ssim` (was undefined, crashed test evaluation), fixed export `torch.load(weights_only=False)` (crashed on torch >= 2.6), exported `unet_isp.py` is now the exact trained architecture (it was a different 3-level network that could not load the weights), tiled-inference reflect-pad crash on small inputs fixed (and benchmarks can no longer block the export), per-worker DataLoader RNG (workers were repeating crops), training loss in float32 with a non-finite guard and LR 1e-4 (run 1 diverged at epoch 13), correct `ColorMatrix2` inversion in the sRGB render, test results passed into `training_results.json`, new Section 17b (ONNX FP32 + INT8 + efficiency table + `model.json` for the app), and a final zip of `exported_model/`. Set `ISP_NB_QUICK=1` for a tiny CPU dry run.
 '''
 # Insert after the export cell, then the zip cell; changes note after the title cell.
 cells.insert(C_EXPORT + 1, md(ONNX_MD))
