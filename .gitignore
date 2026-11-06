@@ -17,3 +17,7 @@ kaggle.json
 
 # eval report is generated with the real Team ID
 eval_P2_TeamID.md
+
+# private, kept locally only
+CONTEXT.md
+docs/brief/
