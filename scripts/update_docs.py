@@ -65,8 +65,17 @@ def block(b: dict) -> str:
     status = ("" if b.get("status") == "final" else
               "> **Provisional:** measured with the classical stand-in; the trained network was not yet available.\n\n")
     raw = b.get("extra", {}).get("raw_domain_psnr", {})
-    rawline = (f"\nRAW-domain denoising by the network alone (packed RGGB vs clean RAW): **{raw['noisy']:.2f} → {raw['denoised']:.2f} dB**.\n"
-               if raw.get("noisy") and raw.get("denoised") else "")
+    rawline = (f"\nRAW-domain denoising (packed RGGB vs clean RAW): noisy **{raw['noisy']:.2f} dB** → network alone "
+               f"**{raw['denoised']:.2f} dB**" if raw.get("noisy") and raw.get("denoised") else "")
+    br_path = Path(__file__).resolve().parent.parent / "results" / "bright_regions.json"
+    if rawline and br_path.exists():  # written by scripts/make_figures.py
+        br = json.loads(br_path.read_text(encoding="utf-8"))
+        w, bb, n = br["whole_image"], br["bright_regions"], br["network_worse_than_input"]
+        rawline += (f" → network inside the noise-model bound (as deployed) **{w['bounded']:.2f} dB**. In bright regions the "
+                    f"network alone is worse than its input ({bb['noisy']:.2f} → {bb['network']:.2f} dB); inside the bound it "
+                    f"improves on it ({bb['bounded']:.2f} dB), and the images it damages drop from {n['network']} to "
+                    f"{n['bounded']} of {br['n_images']}")
+    rawline = (rawline + ".\n") if rawline else ""
     parts = [status + f"Held-out SIDD-CC test scenes {', '.join(d['test_scenes'])}: {d['n_images']} images from 5 phones, "
              f"{d.get('crop', '')} crops, never seen in training or tuning. Model: {b['model']['name']} (`{b['model']['variant']}`). "
              f"Updated {b['updated']}.", "", table(b), rawline]

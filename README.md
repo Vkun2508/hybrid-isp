@@ -21,27 +21,34 @@ decides, photo by photo, how much of the network each image needs, and the app e
 
 ## Results (held-out SIDD-CC test scenes 004 and 008, 26 images, 5 phones)
 <!-- results:start -->
-> **Provisional:** measured with the classical stand-in; the trained network was not yet available.
-
-Held-out SIDD-CC test scenes 004, 008: 26 images from 5 phones, centre 1536x1024 crops, never seen in training or tuning. Model: Placeholder (classical stand-in) (`classical stand-in (no trained weights)`). Updated 2026-11-06 23:19.
+Held-out SIDD-CC test scenes 004, 008: 26 images from 5 phones, centre 1536x1024 crops, never seen in training or tuning. Model: LightweightISPUNet (SIDD-CC RAW denoiser) (`isp_unet.onnx`). Updated 2026-11-07 09:20.
 
 | Pipeline | PSNR (dB) ↑ | SSIM ↑ | ΔE2000 ↓ | LPIPS ↓ | Time / image |
 |---|---:|---:|---:|---:|---:|
 | Input (no ISP) | 25.26 | 0.5850 | 11.60 | 0.4005 | n/a |
-| Traditional ISP | 25.40 | 0.6493 | 7.73 | 0.5171 | 216 ms |
-| Learned only | 28.22 | 0.7161 | 7.73 | **0.2834** | 132 ms |
-| **Hybrid (ours)** | **29.13** | **0.7729** | **5.79** | 0.4029 | 223 ms |
+| Traditional ISP | 25.40 | 0.6493 | 7.73 | 0.5171 | 176 ms |
+| Learned only | 28.37 | 0.7553 | 6.41 | **0.3609** | 440 ms |
+| **Hybrid (ours)** | **29.84** | **0.8016** | **5.34** | 0.3651 | 576 ms |
 
-RAW-domain denoising by the network alone (packed RGGB vs clean RAW): **40.34 → 42.74 dB**.
+RAW-domain denoising (packed RGGB vs clean RAW): noisy **40.34 dB** → network alone **40.96 dB** → network inside the noise-model bound (as deployed) **43.39 dB**. In bright regions the network alone is worse than its input (30.08 → 28.24 dB); inside the bound it improves on it (31.32 dB), and the images it damages drop from 14 to 2 of 26.
+
+**Efficiency** (optimisation: static INT8 post-training quantisation):
+
+| Model | Parameters | Size | CPU latency, 1 MP RAW |
+|---|---:|---:|---:|
+| ONNX FP32 | 1,004,996 | 4.04 MB | 242 ms |
+| ONNX INT8 | 1,004,996 | 1.16 MB | 184 ms |
 
 **Robustness** (mean PSNR over the robustness subset as each degradation grows):
 
-- **Added sensor noise** (worst level, 12800 approx. ISO): hybrid 19.49 dB, learned only 18.13 dB, traditional 14.78 dB.
-- **Under-exposure** (worst level, -4.0 EV): hybrid 27.47 dB, learned only 11.26 dB, traditional 11.29 dB.
-- **White-balance error** (worst level, 1.0 error (fraction of R/B gain)): hybrid 24.56 dB, learned only 19.25 dB, traditional 18.68 dB.
+- **Added sensor noise** (worst level, 12800 approx. ISO): hybrid 20.34 dB, learned only 19.50 dB, traditional 14.78 dB.
+- **Under-exposure** (worst level, -4.0 EV): hybrid 24.63 dB, learned only 11.25 dB, traditional 11.29 dB.
+- **White-balance error** (worst level, 1.0 error (fraction of R/B gain)): hybrid 20.14 dB, learned only 19.43 dB, traditional 18.68 dB.
 
 Full tables, curves, the ablation study and failure cases: the website's **Results** tab, [`results/benchmarks.json`](results/benchmarks.json) and [`docs/failure_cases.md`](docs/failure_cases.md).
 <!-- results:end -->
+
+**Figures** (low light, backlit scenes, bright-region preservation, intermediate states) and the **ablation study** (with vs without each module, fixed vs adaptive routing): [docs/design.md §6.1–6.2](docs/design.md#61-visual-outputs-and-intermediate-states).
 
 ## Run it
 

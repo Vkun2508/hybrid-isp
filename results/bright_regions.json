@@ -1,0 +1,249 @@
+{
+ "k_sigma": 2.0,
+ "n_images": 26,
+ "whole_image": {
+  "noisy": 40.34,
+  "network": 40.96,
+  "bounded": 43.39
+ },
+ "bright_regions": {
+  "n_images": 13,
+  "noisy": 30.08,
+  "network": 28.24,
+  "bounded": 31.32
+ },
+ "network_worse_than_input": {
+  "network": 14,
+  "bounded": 2
+ },
+ "backlit_exposure": {
+  "file": "pixel4a.dng",
+  "gain_aware": 1.113,
+  "gain_mean_only": 1.906,
+  "clipped_pct_aware": 4.32,
+  "clipped_pct_mean_only": 5.79
+ },
+ "per_image": [
+  {
+   "instance": "0075_004_N6_00800_00080_3200_L",
+   "bright_share": 0.034,
+   "noisy": 36.64,
+   "network": 39.75,
+   "bounded": 41.25,
+   "noisy_bright": 26.8,
+   "network_bright": 26.29,
+   "bounded_bright": 28.31
+  },
+  {
+   "instance": "0076_004_N6_03200_00320_3200_L",
+   "bright_share": 0.034,
+   "noisy": 29.39,
+   "network": 37.11,
+   "bounded": 36.96,
+   "noisy_bright": 21.85,
+   "network_bright": 26.02,
+   "bounded_bright": 26.21
+  },
+  {
+   "instance": "0077_004_G4_00100_00025_3200_N",
+   "bright_share": 0.067,
+   "noisy": 39.27,
+   "network": 38.12,
+   "bounded": 41.57,
+   "noisy_bright": 28.93,
+   "network_bright": 27.22,
+   "bounded_bright": 30.89
+  },
+  {
+   "instance": "0078_004_G4_00200_00050_3200_N",
+   "bright_share": 0.068,
+   "noisy": 38.42,
+   "network": 37.48,
+   "bounded": 40.32,
+   "noisy_bright": 28.63,
+   "network_bright": 26.57,
+   "bounded_bright": 29.68
+  },
+  {
+   "instance": "0083_004_GP_00050_00020_4400_N",
+   "bright_share": 0.073,
+   "noisy": 40.47,
+   "network": 36.6,
+   "bounded": 40.73,
+   "noisy_bright": 30.1,
+   "network_bright": 25.92,
+   "bounded_bright": 30.29
+  },
+  {
+   "instance": "0084_004_GP_00200_00100_4400_N",
+   "bright_share": 0.062,
+   "noisy": 40.7,
+   "network": 37.68,
+   "bounded": 42.28,
+   "noisy_bright": 30.56,
+   "network_bright": 26.26,
+   "bounded_bright": 31.32
+  },
+  {
+   "instance": "0086_004_GP_00100_00100_5500_L",
+   "bright_share": 0.006,
+   "noisy": 49.57,
+   "network": 47.0,
+   "bounded": 52.01
+  },
+  {
+   "instance": "0087_004_GP_00800_00640_5500_L",
+   "bright_share": 0.007,
+   "noisy": 44.43,
+   "network": 44.07,
+   "bounded": 48.02
+  },
+  {
+   "instance": "0088_004_IP_00100_00050_5500_N",
+   "bright_share": 0.104,
+   "noisy": 39.39,
+   "network": 34.98,
+   "bounded": 40.7,
+   "noisy_bright": 32.47,
+   "network_bright": 25.69,
+   "bounded_bright": 32.03
+  },
+  {
+   "instance": "0089_004_IP_00500_00250_5500_N",
+   "bright_share": 0.044,
+   "noisy": 40.39,
+   "network": 37.84,
+   "bounded": 41.93,
+   "noisy_bright": 30.13,
+   "network_bright": 24.97,
+   "bounded_bright": 29.59
+  },
+  {
+   "instance": "0090_004_IP_01600_00750_5500_N",
+   "bright_share": 0.013,
+   "noisy": 43.41,
+   "network": 40.47,
+   "bounded": 45.4
+  },
+  {
+   "instance": "0091_004_IP_00320_00080_3200_L",
+   "bright_share": 0.018,
+   "noisy": 42.8,
+   "network": 40.01,
+   "bounded": 45.08
+  },
+  {
+   "instance": "0092_004_IP_00640_00125_3200_L",
+   "bright_share": 0.011,
+   "noisy": 43.81,
+   "network": 40.62,
+   "bounded": 45.37
+  },
+  {
+   "instance": "0167_008_N6_00100_00050_4400_L",
+   "bright_share": 0.0,
+   "noisy": 44.5,
+   "network": 46.72,
+   "bounded": 48.06
+  },
+  {
+   "instance": "0168_008_N6_00400_00200_4400_L",
+   "bright_share": 0.0,
+   "noisy": 41.37,
+   "network": 49.18,
+   "bounded": 48.95
+  },
+  {
+   "instance": "0170_008_N6_01600_00800_4400_L",
+   "bright_share": 0.0,
+   "noisy": 34.37,
+   "network": 41.87,
+   "bounded": 41.56
+  },
+  {
+   "instance": "0172_008_G4_00100_00100_4400_N",
+   "bright_share": 0.058,
+   "noisy": 35.48,
+   "network": 37.27,
+   "bounded": 38.75,
+   "noisy_bright": 31.05,
+   "network_bright": 33.9,
+   "bounded_bright": 35.76
+  },
+  {
+   "instance": "0175_008_S6_00100_00025_5500_L",
+   "bright_share": 0.0,
+   "noisy": 43.51,
+   "network": 45.27,
+   "bounded": 46.8
+  },
+  {
+   "instance": "0180_008_GP_00100_00100_5500_N",
+   "bright_share": 0.111,
+   "noisy": 34.56,
+   "network": 32.42,
+   "bounded": 33.77,
+   "noisy_bright": 31.42,
+   "network_bright": 28.36,
+   "bounded_bright": 30.11
+  },
+  {
+   "instance": "0181_008_GP_00800_00800_5500_N",
+   "bright_share": 0.103,
+   "noisy": 34.98,
+   "network": 35.12,
+   "bounded": 36.61,
+   "noisy_bright": 31.79,
+   "network_bright": 31.78,
+   "bounded_bright": 33.39
+  },
+  {
+   "instance": "0184_008_IP_00100_00100_3200_L",
+   "bright_share": 0.0,
+   "noisy": 42.86,
+   "network": 42.31,
+   "bounded": 43.87
+  },
+  {
+   "instance": "0186_008_IP_00800_00800_3200_L",
+   "bright_share": 0.0,
+   "noisy": 48.56,
+   "network": 54.79,
+   "bounded": 54.76
+  },
+  {
+   "instance": "0188_008_IP_00100_00100_3200_N",
+   "bright_share": 0.313,
+   "noisy": 34.54,
+   "network": 30.86,
+   "bounded": 34.48,
+   "noisy_bright": 32.3,
+   "network_bright": 27.7,
+   "bounded_bright": 32.27
+  },
+  {
+   "instance": "0189_008_IP_00400_00400_3200_N",
+   "bright_share": 0.057,
+   "noisy": 38.73,
+   "network": 39.45,
+   "bounded": 40.65,
+   "noisy_bright": 35.04,
+   "network_bright": 36.44,
+   "bounded_bright": 37.37
+  },
+  {
+   "instance": "0190_008_IP_00800_00800_3200_N",
+   "bright_share": 0.0,
+   "noisy": 41.87,
+   "network": 46.77,
+   "bounded": 47.12
+  },
+  {
+   "instance": "0191_008_IP_01600_01600_3200_N",
+   "bright_share": 0.0,
+   "noisy": 44.92,
+   "network": 51.3,
+   "bounded": 51.22
+  }
+ ]
+}

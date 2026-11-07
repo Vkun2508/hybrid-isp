@@ -37,7 +37,11 @@ cases 4–6 are failures found during development, kept here with their fixes.
 ## 5. The network erased detail in bright regions (fixed)
 - **Found on:** the full test images. The raw network made several low-ISO, well-lit images worse in the RAW domain, e.g. iPhone ISO 100: 39.4 → 34.8 dB. In regions above about 20% of white its corrections were 3–5× larger than the sensor noise there could explain, so it was removing texture and shifting highlights. (The training data is mostly dark.)
 - **Fix: a classical trust region.** The sensor's noise-level function σ²(x) = a·x + b is estimated from each image, and the network may change a pixel by at most k·σ(x), with k tuned on the validation scene.
-- **Result:** across the 26 test images, RAW PSNR goes from 40.9 → about 43 dB, and every image the network used to damage now improves on its input.
+- **Result** (26 test images, RAW PSNR; `results/bright_regions.json`):
+  - Whole image: network alone 40.96 dB, inside the bound **43.39 dB** (noisy input 40.34).
+  - Bright regions: network alone 28.24 dB, inside the bound **31.32 dB** (input 30.08).
+  - Images worse than their input: 14 of 26 without the bound, 2 with it. Both are ISO 100 shots in good light: 0180 −0.8 dB and 0188 −0.06 dB.
+  - See the [bright-region figure](figures/fig_bright_regions.jpg).
 
 ## 6. Training diverged at epoch 13
 - **What happened:** the Kaggle run's loss spiked at epoch 13 and validation PSNR crashed from 52.4 to 29 dB ([training curves](../training/kaggle_run/training_curves.png)). Early stopping ended the run at epoch 21. Because the best checkpoint is only saved on improvement, the exported model is the epoch-11 one (validation 52.4 dB).
