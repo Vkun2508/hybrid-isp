@@ -1,8 +1,8 @@
 # Hybrid ISP: a classical + learned smartphone camera pipeline
 
-**Live demo: https://amplifier-addition-gains-clip.trycloudflare.com** · Computer Vision Hackathon 2026, Problem P2
+**Live demo: https://vkun05-hybrid-isp.hf.space** · Computer Vision Hackathon 2026, Problem P2
 
-Works on phone and laptop. Served from the team's machine through a Cloudflare tunnel (`scripts/start_public.bat`); the same app also runs anywhere with the `Dockerfile`, or on Modal (`modal_app.py`).
+Works on phone and laptop. Hosted as a Hugging Face Docker Space built from this repo's `Dockerfile` (`scripts/deploy_space.py`). Backup link, served from the team's laptop through a Cloudflare tunnel: https://amplifier-addition-gains-clip.trycloudflare.com. The same app runs anywhere with the `Dockerfile`.
 
 Turns noisy, badly exposed, wrongly white-balanced smartphone **RAW** into a clean sRGB photo. Classical
 ISP stages do the parts that are exact (black level, white balance, demosaicing, the calibrated colour matrix,
