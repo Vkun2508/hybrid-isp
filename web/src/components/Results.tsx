@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { ApiError, getBenchmarks, type Benchmarks } from "../api";
+import type { ApiError, Benchmarks } from "../api";
 import { fixed } from "../format";
 
 const SERIES_COLOUR: Record<string, string> = {
@@ -42,24 +41,10 @@ function Legend({ keys }: { keys: string[] }) {
   );
 }
 
-// Stale-while-revalidate: the last results show instantly on every visit to the tab, then refresh in the
-// background (and again when the window regains focus), so switching tabs never flashes a skeleton.
-let cached: Benchmarks | null = null;
+type Bench = { b: Benchmarks | null; err: ApiError | null; reload: () => void };
 
-export function Results() {
-  const [b, setB] = useState<Benchmarks | null>(cached);
-  const [err, setErr] = useState<ApiError | null>(null);
-  const load = () => {
-    setErr(null);
-    getBenchmarks()
-      .then((d) => { cached = d; setB(d); })
-      .catch((e) => { if (!cached) setErr(e as ApiError); }); // keep showing stale data if a refresh fails
-  };
-  useEffect(() => {
-    load();
-    window.addEventListener("focus", load);
-    return () => window.removeEventListener("focus", load);
-  }, []);
+export function Results({ bench }: { bench: Bench }) {
+  const { b, err, reload: load } = bench;
 
   if (err)
     return (

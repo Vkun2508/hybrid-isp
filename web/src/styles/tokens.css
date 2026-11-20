@@ -1,66 +1,84 @@
-/* Hybrid ISP — "viewing booth" tokens.
-   Dealt taste sheet: data-terminal (seed 686060516). Dark neutral surround so the interface never
-   biases colour judgement of the photos; colour lives on data and on the one Hybrid accent. */
+/* Hybrid ISP — "viewing booth" tokens, final-round redesign.
+   A dark neutral surround so the interface never biases colour judgement of the photos.
+   Colour lives on the data: every pipeline has one identity colour, used the same way on
+   chips, viewer labels, chart lines and table rows.
+     grey  = classical maths (Traditional)
+     warm  = the neural network (Learned only, and network stages inside the hybrid)
+     blue  = the hybrid, which is also the one action colour
+   Palette checked with frontend-master/scripts/palette.mjs (PASS). */
 :root {
   color-scheme: dark;
 
-  /* ground and surfaces (cards sit darker than the ground) */
-  --ground: #171719;
-  --surface: #131217;
-  --raised: #212023;
-  --inset: #0e0e11;          /* image well */
-  --border: #222224;
-  --rule: #1b1a1f;
-  --control: #3a3a3e;
+  /* ground and surfaces: surfaces step lighter as they rise */
+  --ground: #141416;
+  --surface: #1c1c1f;
+  --raised: #26262a;
+  --inset: #0c0c0e;          /* image wells */
+  --line: #2b2b30;           /* hairlines inside cards */
+  --control: #3d3d43;
 
-  /* text: white, one secondary grey, one meta grey (both >= 4.5:1 on --surface) */
-  --text: #ffffff;
-  --secondary: #bdbdc0;
-  --muted: #8a8c92;
+  /* text */
+  --text: #f2f2f4;
+  --secondary: #c6c7cd;
+  --muted: #9d9ea6;
 
-  /* the one hue: Hybrid's marks and 1px selection lines */
-  --accent: #4a8ad6;
-  --positive: #44a282;
-  --negative: #e5566f;
-  --warning: #d9a441;
-  --pill-positive-bg: #1b2828; --pill-positive-ink: #5fc39c;
-  --pill-negative-bg: #2c1a20; --pill-negative-ink: #e5566f;
-  --pill-warning-bg: #2a2416;  --pill-warning-ink: #d9a441;
-  --pill-neutral-bg: #212023;  --pill-neutral-ink: #bdbdc0;
-  --chart-neutral-1: #f2f2f3;
-  --chart-neutral-2: #8a8c92;
-  --grid: #2b2b2f;
+  /* pipeline identities */
+  --p-input: #75777d;
+  --p-traditional: #b4b6bc;
+  --p-learned: #eba56d;
+  --p-hybrid: #5ca3ff;
+  --p-gt: #f2f2f4;
 
-  --shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-  --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.45);
+  /* the action colour is the hybrid's blue */
+  --accent: #5ca3ff;
+  --accent-hover: #7db6ff;
+  --accent-ink: #0b1626;
+  --accent-soft: rgba(92, 163, 255, 0.14);
+  --learned-soft: rgba(235, 165, 109, 0.14);
 
-  --radius-card: 6px;
-  --radius-thumb: 4px;
+  --positive: #52c49a;
+  --negative: #f2788b;
+  --warning: #e6b452;
+  --pill-positive-bg: #17302a; --pill-positive-ink: #6fd6ad;
+  --pill-negative-bg: #341d23; --pill-negative-ink: #f2788b;
+  --pill-warning-bg: #2f2816;  --pill-warning-ink: #e6b452;
+  --pill-neutral-bg: #26262a;  --pill-neutral-ink: #c6c7cd;
+  --grid: #2b2b30;
+
+  --shadow-float: 0 18px 48px rgba(0, 0, 0, 0.5);
+
+  --radius-card: 16px;
+  --radius-thumb: 10px;
+  --radius-small: 6px;
   --radius-control: 999px;
 
   /* 4px spacing scale */
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px;
-  --gap: 24px;
-  --pad: 24px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px; --s12: 48px; --s16: 64px;
+  --gap: 20px;
+  --pad: 32px;
   --card-pad: 20px;
-  --control-height: 34px;
-  --row-height: 44px;
-  --topbar: 56px;
+  --control-height: 36px;
+  --topbar: 60px;
+  --tabbar: 0px;             /* the phone bottom tab bar sets this */
 
-  --font: "Public Sans", Inter, system-ui, sans-serif;
+  --font: "Mona Sans Variable", "Mona Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --fs-title: 24px;
-  --fs-section: 16px;
-  --fs-body: 14px;
+  --fs-hero: clamp(36px, 5.6vw, 64px);
+  --fs-title: clamp(24px, 2.6vw, 32px);
+  --fs-section: 18px;
+  --fs-body: 15px;
   --fs-small: 13px;
   --fs-tiny: 12px;
+  --fs-num-xl: clamp(34px, 4.4vw, 52px);
 
-  /* motion: feedback only */
+  /* motion: feedback, one signature, nothing decorative */
   --dur-fast: 120ms;
-  --dur: 180ms;
+  --dur: 200ms;
+  --dur-slow: 360ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-@media (max-width: 900px) {
-  :root { --gap: 16px; --pad: 16px; --card-pad: 16px; --fs-title: 20px; }
+@media (max-width: 999px) {
+  :root { --pad: 16px; --gap: 16px; --card-pad: 16px; --tabbar: 60px; }
 }
