@@ -168,8 +168,8 @@
 .meter-bar .zone:first-child { border-radius: 5px 0 0 5px; }
 .meter-bar .zone:last-of-type { border-radius: 0 5px 5px 0; }
 .meter-bar .zone + .zone { box-shadow: inset 2px 0 0 var(--surface); }
-.meter-bar .zone.net { background: rgba(235, 165, 109, 0.28); }
-.meter-bar .zone.chroma { background: rgba(235, 165, 109, 0.5); }
+.meter-bar .zone.net { background: rgba(227, 154, 92, 0.28); }
+.meter-bar .zone.chroma { background: rgba(227, 154, 92, 0.5); }
 .meter-bar .zone.dead { background: #34343a; }
 .meter-bar .zone.act { background: rgba(92, 163, 255, 0.3); }
 .meter-bar .zone:not(.active) { opacity: 0.55; }
@@ -196,7 +196,7 @@
   background: var(--raised); box-shadow: inset 3px 0 0 var(--p-traditional);
   transition: opacity var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
 }
-.pnode.learned { box-shadow: inset 3px 0 0 var(--p-learned); background: rgba(235, 165, 109, 0.1); }
+.pnode.learned { box-shadow: inset 3px 0 0 var(--p-learned); background: rgba(227, 154, 92, 0.1); }
 .pnode.router { box-shadow: inset 3px 0 0 var(--accent); }
 .pnode.out { box-shadow: inset 3px 0 0 var(--text); }
 .pnode .pk { font-weight: 620; font-size: 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

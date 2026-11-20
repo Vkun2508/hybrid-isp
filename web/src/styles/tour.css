@@ -1,0 +1,42 @@
+/* ================================================================ guided demo */
+.tour-sheet {
+  position: fixed; z-index: 60; right: 24px; bottom: 24px; width: 400px; max-width: calc(100vw - 32px);
+  display: grid; gap: 8px; padding: 16px 18px 14px; border-radius: 18px;
+  background: var(--raised); border: 1px solid var(--control); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  animation: sheet-in var(--dur-slow) var(--ease-drawer);
+}
+.tour-sheet:focus { outline: none; }
+.tour-sheet:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes sheet-in { from { opacity: 0; translate: 0 16px; } }
+.tour-top { display: flex; align-items: center; gap: 10px; }
+.tour-count { font-size: 12px; color: var(--muted); }
+.tour-dots { display: flex; gap: 5px; flex: 1; }
+.tour-dots i { width: 18px; height: 4px; border-radius: 2px; background: var(--control); transition: background-color var(--dur) var(--ease-out); }
+.tour-dots i.done { background: var(--secondary); }
+.tour-dots i.on { background: var(--accent); }
+.tour-x { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--surface); color: var(--secondary); display: grid; place-items: center; }
+.tour-x:hover { color: var(--text); }
+.tour-sheet h2 { font-size: 19px; font-weight: 680; letter-spacing: -0.015em; font-stretch: 108%; line-height: 1.25; }
+.tour-body { color: var(--secondary); font-size: 14.5px; line-height: 1.5; }
+.tour-body b { color: var(--text); font-weight: 620; }
+.tour-wait { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; color: var(--muted); font-size: 13px; }
+.tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
+.tour-end { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+/* the thing to look at */
+.tour-ring { position: relative; z-index: 2; border-radius: var(--radius-card); box-shadow: 0 0 0 2px var(--accent), 0 0 0 8px rgba(92, 163, 255, 0.18); transition: box-shadow var(--dur-slow) var(--ease-out); }
+.viewer.tour-ring { border-radius: var(--radius-thumb); }
+
+@media (max-width: 999px) {
+  .tour-sheet {
+    left: 8px; right: 8px; width: auto; max-width: none;
+    bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + 8px);
+    padding: 12px 14px 10px; gap: 6px; border-radius: 16px;
+  }
+  .tour-sheet h2 { font-size: 16.5px; }
+  .tour-body { font-size: 13.5px; line-height: 1.45; }
+  .tour-actions .btn { height: 40px; min-height: 40px; }
+  /* leave room to scroll the last card above the sheet */
+  body:has(.tour-sheet) { padding-bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + 220px); }
+}
+.loupe.tour-ring { border-radius: var(--radius-small); }

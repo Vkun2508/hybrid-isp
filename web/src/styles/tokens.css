@@ -23,9 +23,9 @@
   --muted: #9d9ea6;
 
   /* pipeline identities */
-  --p-input: #75777d;
-  --p-traditional: #b4b6bc;
-  --p-learned: #eba56d;
+  --p-input: #5d6066;
+  --p-traditional: #868a93;
+  --p-learned: #e39a5c;
   --p-hybrid: #5ca3ff;
   --p-gt: #f2f2f4;
 
@@ -34,7 +34,7 @@
   --accent-hover: #7db6ff;
   --accent-ink: #0b1626;
   --accent-soft: rgba(92, 163, 255, 0.14);
-  --learned-soft: rgba(235, 165, 109, 0.14);
+  --learned-soft: rgba(227, 154, 92, 0.14);
 
   --positive: #52c49a;
   --negative: #f2788b;

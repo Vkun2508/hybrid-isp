@@ -199,7 +199,7 @@ export function Loupe({ result, lens, zoom, onZoom, onTile }: {
   const W = result?.input.width ?? 3;
   const H = result?.input.height ?? 2;
   const hasGt = !!result?.input.gt_url;
-  const keys: ImageKey[] = ["traditional", "learned", "hybrid", ...(hasGt ? (["gt"] as ImageKey[]) : [])];
+  const keys: ImageKey[] = ["traditional", "hybrid", "learned", ...(hasGt ? (["gt"] as ImageKey[]) : [])];
   const [tw, th] = [tileRef.current?.clientWidth ?? 200, tileRef.current?.clientHeight ?? 133];
   const style = (k: ImageKey) => {
     const url = result ? urlOf(result, k) : null;
