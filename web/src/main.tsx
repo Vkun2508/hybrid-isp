@@ -7,6 +7,7 @@ import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/lab.css";
 import "./styles/overview.css";
+import "./styles/story.css";
 import "./styles/results.css";
 import "./styles/tour.css";
 import App from "./App";

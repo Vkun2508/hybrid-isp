@@ -1,0 +1,40 @@
+{
+ "sample": "sidd-n6-iso3200-lowlight",
+ "camera": "Nexus 6",
+ "iso": 3200,
+ "ev": -3.0,
+ "grid": [
+  192,
+  128
+ ],
+ "step": 8,
+ "photosites": 24576,
+ "gamma": 0.45,
+ "gain": 10.82,
+ "wb": [
+  1.245,
+  1.0,
+  2.54
+ ],
+ "psnr": {
+  "traditional": 13.275,
+  "learned": 13.299,
+  "hybrid": 25.6
+ },
+ "classical_gain": {
+  "psnr": 17.851,
+  "ssim": 0.18,
+  "delta_e": 14.743
+ },
+ "level": 3,
+ "stats": {
+  "noisy_jitter": 13.19,
+  "denoised_jitter": 6.48,
+  "gained_jitter": 21.41,
+  "mean_hA": 19.2,
+  "mean_hB": 19.7,
+  "mean_hC": 62.3,
+  "gained_noisy_jitter": 43.62,
+  "mean_hD": 61.7
+ }
+}

@@ -6,6 +6,7 @@ import type { Lab } from "../lab/useLab";
 import { headline } from "../useBenchmarks";
 import { LineChart } from "./charts";
 import { HeroLight } from "./HeroLight";
+import { SensorStory } from "./SensorStory";
 import { PipelineMap } from "./PipelineMap";
 import { Term } from "./Term";
 import type { Tab } from "./TopBar";
@@ -36,6 +37,9 @@ function CountUp({ to, digits, go, prefix = "" }: { to: number | null; digits: n
 export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Benchmarks | null; onTab: (t: Tab) => void; onTour: () => void }) {
   const [hero, setHero] = useState<HeroData | null>(null);
   const [counted, setCounted] = useState(false);
+  // the 3D sensor story, unless motion is reduced (or WebGL/data fails): then the "Lights down" hero
+  const [mode, setMode] = useState<"story" | "light">(() =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "light" : "story");
   const stop = useRef(0); // the dial's stop, read on click only (state here would re-render the whole page per stop)
   const warmed = useRef(false);
 
@@ -73,7 +77,7 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
     <div className="hero-stats" aria-label="Headline results on the test set">
       <div className="hstat">
         <span className="hstat-n num accent"><CountUp to={h.dPsnr} digits={1} go={counted} prefix="+" /><small>dB</small></span>
-        <span className="hstat-l">cleaner than a traditional pipeline <span style={{ whiteSpace: "nowrap" }}>(<Term k="psnr">PSNR</Term>,</span> {h.n ?? 26} unseen images)</span>
+        <span className="hstat-l">cleaner than a traditional pipeline: the <span style={{ whiteSpace: "nowrap" }}>average <Term k="psnr">PSNR</Term></span> over {h.n ?? 26} unseen test images</span>
       </div>
       <div className="hstat">
         <span className="hstat-n num">{fixed(h.deFrom, 1)}<i>→</i><CountUp to={h.deTo} digits={1} go={counted} /></span>
@@ -88,6 +92,18 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
 
   return (
     <main className="overview" id="main">
+      {mode === "story" ? (
+        <>
+          <SensorStory
+            onFallback={() => setMode("light")}
+            onTour={onTour}
+            onTab={onTab}
+            onRunLive={() => runLive(3)}
+            onDone={() => setCounted(true)}
+          />
+          <section className="hero-below story-below" aria-label="Headline results">{stats}</section>
+        </>
+      ) : (
       <section className="hero" aria-labelledby="ov-h">
         <HeroLight
           hero={hero}
@@ -122,6 +138,7 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
           {stats}
         </div>
       </section>
+      )}
 
       <div className="ov-body">
       <section className="ov-how" aria-labelledby="how-h">
@@ -138,7 +155,7 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
             <h2 id="proof-h">When the light drops, it holds</h2>
             <p>
               At {Math.abs(h.dark.ev)} stops under-exposed the hybrid still scores <b className="num">{h.dark.hybrid.toFixed(1)}&nbsp;dB</b>; the
-              others fall to <span className="num">{h.dark.others.toFixed(1)}&nbsp;dB</span>. The classical stage fixes exposure exactly, so the
+              baselines, which have no auto-exposure of their own, fall to <span className="num">{h.dark.others.toFixed(1)}&nbsp;dB</span>. The classical stage fixes exposure exactly, so the
               network only has to remove noise.
             </p>
           </div>
