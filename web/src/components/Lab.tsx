@@ -51,7 +51,7 @@ export function LabView({ lab, onTour }: { lab: Lab; onTour: () => void }) {
 
       <div className="lab-stage">
         <CompareViewer
-          result={result} busy={lab.busy} elapsed={lab.elapsed} error={lab.error} onRetry={lab.retry} onReset={lab.backToSamples}
+          result={result} busy={lab.busy} loadingImages={lab.loadingImages} elapsed={lab.elapsed} error={lab.error} onRetry={lab.retry} onReset={lab.backToSamples}
           pair={lab.pair} onPair={lab.setPair} split={lab.split} onSplit={lab.setSplit}
           lens={lab.lens} onLens={lab.setLens} tile={tile} zoom={lab.zoom}
         />

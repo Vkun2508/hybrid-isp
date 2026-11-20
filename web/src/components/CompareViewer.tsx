@@ -20,6 +20,7 @@ const KEYS: ImageKey[] = ["input", "traditional", "learned", "hybrid", "gt"];
 interface Props {
   result: ProcessResponse | null;
   busy: boolean;
+  loadingImages?: boolean;
   elapsed: number;
   error: ApiError | null;
   onRetry: () => void;
@@ -35,7 +36,7 @@ interface Props {
   zoom: Zoom;
 }
 
-export function CompareViewer({ result, busy, elapsed, error, onRetry, onReset, pair, onPair, split, onSplit, lens, onLens, tile, zoom }: Props) {
+export function CompareViewer({ result, busy, loadingImages, elapsed, error, onRetry, onReset, pair, onPair, split, onSplit, lens, onLens, tile, zoom }: Props) {
   const [custom, setCustom] = useState(false);
   const [boxW, setBoxW] = useState(800);
   const areaRef = useRef<HTMLDivElement>(null);
@@ -134,7 +135,7 @@ export function CompareViewer({ result, busy, elapsed, error, onRetry, onReset, 
         </div>
         {busy && (
           <span className="pill status-chip num" role="status">
-            <span className="spinner" aria-hidden="true" /> Processing on CPU · {(elapsed / 1000).toFixed(1)} s
+            <span className="spinner" aria-hidden="true" /> {loadingImages ? "Loading the images…" : <>Processing on CPU · {(elapsed / 1000).toFixed(1)} s</>}
           </span>
         )}
         {error && !busy && (

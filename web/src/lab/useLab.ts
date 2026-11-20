@@ -9,6 +9,17 @@ export type Source = { kind: "sample"; sample: Sample } | { kind: "file"; file: 
 export type Pair = [ImageKey, ImageKey];
 export type Zoom = 1 | 2 | 4;
 
+/** Fetch the output images before showing a result, so numbers and pictures change together (capped, never hangs). */
+function preload(urls: string[], capMs = 8000): Promise<void> {
+  const all = Promise.all(urls.map((u) => new Promise<void>((res) => {
+    const im = new Image();
+    im.onload = () => res();
+    im.onerror = () => res();
+    im.src = u;
+  })));
+  return Promise.race([all.then(() => undefined), new Promise<void>((res) => setTimeout(res, capMs))]);
+}
+
 export const ZERO: SimPreset = { noise: 0, exposure_ev: 0, wb_shift: 0 };
 export const sameSim = (a: SimPreset, b: SimPreset) =>
   a.noise === b.noise && a.exposure_ev === b.exposure_ev && a.wb_shift === b.wb_shift;
@@ -23,6 +34,7 @@ export function useLab() {
   const [result, setResult] = useState<ProcessResponse | null>(null);
   const [resultSource, setResultSource] = useState<Source | null>(null); // which input the shown result belongs to
   const [busy, setBusy] = useState(false);
+  const [loadingImages, setLoadingImages] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [startedAt, setStartedAt] = useState(0);
   const [now, setNow] = useState(0);
@@ -52,6 +64,7 @@ export function useLab() {
     const c = new AbortController();
     ctrl.current = c;
     setBusy(true);
+    setLoadingImages(false);
     setError(null);
     setStartedAt(performance.now());
     processImage({
@@ -59,7 +72,11 @@ export function useLab() {
       file: src.kind === "file" ? src.file : undefined,
       sim: s, route: rt, signal: c.signal,
     })
-      .then((r) => {
+      .then(async (r) => {
+        if (c.signal.aborted) return;
+        setLoadingImages(true);
+        await preload([r.outputs.traditional?.image_url, r.outputs.hybrid?.image_url, r.outputs.learned?.image_url, r.input.gt_url]
+          .filter((u): u is string => !!u));
         if (c.signal.aborted) return;
         setResult(r);
         setResultSource(src);
@@ -70,7 +87,7 @@ export function useLab() {
         setError(e instanceof ApiError ? e : new ApiError("unknown", "Something went wrong.", "Try again.", 0));
       })
       .finally(() => {
-        if (ctrl.current === c) setBusy(false);
+        if (ctrl.current === c) { setBusy(false); setLoadingImages(false); }
       });
   }, []);
 
@@ -111,7 +128,7 @@ export function useLab() {
 
   const preset = source?.kind === "sample" ? source.sample.preset : ZERO;
   return {
-    model, samples, source, sim, route, result, busy, error, preset,
+    model, samples, source, sim, route, result, busy, loadingImages, error, preset,
     elapsed: busy ? Math.max(0, now - startedAt) : 0,
     /** the result on screen is for an older input (still processing, or the new one failed) */
     stale: !!result && (busy || resultSource !== source),
