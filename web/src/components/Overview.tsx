@@ -1,73 +1,119 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { processImage, type Benchmarks, type ProcessResponse } from "../api";
 import { fixed } from "../format";
-import type { Lab } from "../lab/useLab";
+import { preload, type Lab } from "../lab/useLab";
 import { headline } from "../useBenchmarks";
 import { LineChart } from "./charts";
-import { Develop } from "./Develop";
+import { HeroSweep } from "./HeroSweep";
 import { PipelineMap } from "./PipelineMap";
 import { Term } from "./Term";
 import type { Tab } from "./TopBar";
 
+const NIGHT = { noise: 0, exposure_ev: -3, wb_shift: 0 };
+const NIGHT_WAIT_MS = 5000;
+
+/** Counts up to a value once `go` turns true (instant with reduced motion). */
+function CountUp({ to, digits, go, prefix = "" }: { to: number | null; digits: number; go: boolean; prefix?: string }) {
+  const [v, setV] = useState<number | null>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    if (to === null || !go) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setV(to); return; }
+    const t0 = performance.now(), D = 900;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - t0) / D);
+      setV(to * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [to, go]);
+  if (to === null) return <>—</>;
+  return <>{prefix}{(v ?? (go ? 0 : to)).toFixed(digits)}</>;
+}
+
 export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Benchmarks | null; onTab: (t: Tab) => void; onTour: () => void }) {
-  const [hero, setHero] = useState<ProcessResponse | null>(null);
+  const [shot, setShot] = useState<ProcessResponse | null>(null);
+  const [counted, setCounted] = useState(false);
   const first = lab.samples?.[0];
 
-  // the first sample is precomputed on the server, so the hero lands instantly
+  // the hero wants the night shot (3 stops under) — dramatic, and the tour reuses it from the server cache.
+  // The as-captured shot is precomputed; if the night one isn't back within 5 s, use that instead.
   useEffect(() => {
     if (!first) return;
     const c = new AbortController();
-    processImage({ sampleId: first.id, sim: first.preset, route: "auto", signal: c.signal })
-      .then(setHero)
-      .catch(() => undefined);
-    return () => c.abort();
+    let settled = false;
+    const use = (r: ProcessResponse) => {
+      if (settled) return;
+      settled = true;
+      preload([r.input.image_url, r.outputs.traditional.image_url, r.outputs.hybrid.image_url])
+        .then(() => { if (!c.signal.aborted) setShot(r); });
+    };
+    const captured = processImage({ sampleId: first.id, sim: first.preset, route: "auto", signal: c.signal });
+    captured.catch(() => undefined);
+    processImage({ sampleId: first.id, sim: NIGHT, route: "auto", signal: c.signal })
+      .then(use)
+      .catch(() => captured.then(use).catch(() => undefined));
+    const t = setTimeout(() => captured.then(use).catch(() => undefined), NIGHT_WAIT_MS);
+    return () => { settled = true; clearTimeout(t); c.abort(); };
   }, [first?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const h = headline(bench);
   const under = bench?.robustness?.find((r) => /expos/i.test(r.title));
+  const camera = first?.name.split(" · ").slice(0, 2).join(" · ") ?? "Real phone RAW";
+  const dark = shot ? shot.simulate.exposure_ev < -0.1 : true;
+  const caption = `${camera} · ${dark ? `${Math.abs(shot?.simulate.exposure_ev ?? 3)} stops under-exposed` : "low light"} · real RAW, unseen in training`;
+  const captionShort = `${camera.split(" · ")[0]} · ${dark ? `${Math.abs(shot?.simulate.exposure_ev ?? 3)} stops under` : "low light"} · real RAW`;
+
+  const stats = (
+    <div className="hero-stats" aria-label="Headline results on the test set">
+      <div className="hstat">
+        <span className="hstat-n num accent"><CountUp to={h.dPsnr} digits={1} go={counted} prefix="+" /><small>dB</small></span>
+        <span className="hstat-l">cleaner than a traditional pipeline (<Term k="psnr">PSNR</Term>, {h.n ?? 26} unseen images)</span>
+      </div>
+      <div className="hstat">
+        <span className="hstat-n num">{fixed(h.deFrom, 1)}<i>→</i><CountUp to={h.deTo} digits={1} go={counted} /></span>
+        <span className="hstat-l">colour error <Term k="de">ΔE</Term>, lower is better</span>
+      </div>
+      <div className="hstat">
+        <span className="hstat-n num"><CountUp to={h.int8?.size_mb ?? null} digits={2} go={counted} /><small>MB</small></span>
+        <span className="hstat-l">network after <Term k="int8">INT8</Term>{h.int8 ? `, ${Math.round(h.int8.latency_ms_1mp)} ms per megapixel on a CPU` : ""}</span>
+      </div>
+    </div>
+  );
 
   return (
     <main className="overview" id="main">
-      <section className="ov-hero" aria-labelledby="ov-h">
-        <div className="ov-copy">
-          <p className="eyebrow">Computer Vision Hackathon 2026 · Problem P2</p>
-          <h1 id="ov-h">Camera maths where it’s exact. A network where it isn’t.</h1>
-          <p className="lead">
-            A hybrid smartphone <Term k="isp">camera pipeline</Term>. Textbook maths handles the steps that have exact answers,
-            a 1&nbsp;MB neural network handles the noise, and a <Term k="router">router</Term> decides, photo by photo, how much network each one needs.
-          </p>
-          <div className="ov-ctas">
-            <button className="btn primary large" onClick={onTour}>
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3v10l8-5z" fill="currentColor" /></svg>
-              Start the guided demo
-            </button>
-            <button className="btn large" onClick={() => onTab("lab")}>Try your own photo</button>
+      <section className="hero" aria-labelledby="ov-h">
+        <HeroSweep shot={shot} caption={caption} captionShort={captionShort} onDone={() => setCounted(true)}>
+          <div className="hero-copy">
+            <p className="eyebrow">Computer Vision Hackathon 2026 · Problem P2</p>
+            <h1 id="ov-h">Camera maths where it’s exact. <span>A network where it isn’t.</span></h1>
+            <p className="lead hero-lead">
+              A hybrid smartphone <Term k="isp">camera pipeline</Term>: exact classical maths, a 1M-parameter network for the noise,
+              and a <Term k="router">router</Term> that decides how much network each photo needs.
+            </p>
+            <div className="ov-ctas">
+              <button className="btn primary large" onClick={onTour}>
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3v10l8-5z" fill="currentColor" /></svg>
+                Start the guided demo
+              </button>
+              <button className="btn large ghost hero-second" onClick={() => onTab("lab")}>Try your own photo</button>
+            </div>
           </div>
-        </div>
-        <div className="ov-visual">
-          <Develop result={hero} />
-          {first && <p className="ov-visual-note">{first.name} · real phone RAW from a scene the network never saw.</p>}
-        </div>
-      </section>
-
-      <section className="ov-stats" aria-label="Headline results">
-        <div className="stat">
-          <span className="stat-n num">{h.dPsnr !== null ? `+${h.dPsnr.toFixed(1)}` : "—"}<small>dB</small></span>
-          <span className="stat-l">cleaner than a traditional camera pipeline</span>
-          <span className="stat-s"><Term k="psnr">PSNR</Term>, mean of {h.n ?? "the"} unseen test images</span>
-        </div>
-        <div className="stat">
-          <span className="stat-n num">{h.deFrom !== null && h.deTo !== null ? <>{h.deFrom.toFixed(1)}<i>→</i>{h.deTo.toFixed(1)}</> : "—"}</span>
-          <span className="stat-l">colour error{h.deFrom && h.deTo ? `, down ${Math.round((1 - h.deTo / h.deFrom) * 100)}%` : ""}</span>
-          <span className="stat-s"><Term k="de">ΔE</Term> against the clean reference, lower is better</span>
-        </div>
-        <div className="stat">
-          <span className="stat-n num">{h.int8 ? fixed(h.int8.size_mb, 2) : "—"}<small>MB</small></span>
-          <span className="stat-l">network, after <Term k="int8">INT8</Term> quantisation</span>
-          <span className="stat-s">{h.int8 ? `${(h.int8.params / 1e6).toFixed(1)}M parameters · ${Math.round(h.int8.latency_ms_1mp)} ms per megapixel on a CPU` : " "}</span>
+          <div className="hero-stats-wrap wide-only">{stats}</div>
+        </HeroSweep>
+        <div className="hero-below">
+          <p className="lead">
+            A hybrid smartphone <Term k="isp">camera pipeline</Term>: exact classical maths, a 1M-parameter network for the noise,
+            and a <Term k="router">router</Term> that decides how much network each photo needs.
+          </p>
+          <button className="btn large" onClick={() => onTab("lab")}>Try your own photo</button>
+          {stats}
         </div>
       </section>
 
+      <div className="ov-body">
       <section className="ov-how" aria-labelledby="how-h">
         <div className="ov-sec-head">
           <h2 id="how-h">How it works</h2>
@@ -102,6 +148,7 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
           <button className="btn large" onClick={onTour}>Guided demo</button>
         </div>
       </section>
+      </div>
     </main>
   );
 }

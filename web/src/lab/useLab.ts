@@ -10,7 +10,7 @@ export type Pair = [ImageKey, ImageKey];
 export type Zoom = 1 | 2 | 4;
 
 /** Fetch the output images before showing a result, so numbers and pictures change together (capped, never hangs). */
-function preload(urls: string[], capMs = 8000): Promise<void> {
+export function preload(urls: string[], capMs = 8000): Promise<void> {
   const all = Promise.all(urls.map((u) => new Promise<void>((res) => {
     const im = new Image();
     im.onload = () => res();
