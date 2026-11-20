@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { processImage, type Benchmarks, type ProcessResponse } from "../api";
+import { processImage, type Benchmarks } from "../api";
 import { fixed } from "../format";
-import { preload, type Lab } from "../lab/useLab";
+import { lessLight, loadHero, type HeroData } from "../hero";
+import type { Lab } from "../lab/useLab";
 import { headline } from "../useBenchmarks";
 import { LineChart } from "./charts";
-import { HeroSweep } from "./HeroSweep";
+import { HeroLight } from "./HeroLight";
 import { PipelineMap } from "./PipelineMap";
 import { Term } from "./Term";
 import type { Tab } from "./TopBar";
 
+// the guided tour opens on this photo at −3 EV: ask the server for it early so the tour never waits
 const NIGHT = { noise: 0, exposure_ev: -3, wb_shift: 0 };
-const NIGHT_WAIT_MS = 5000;
 
 /** Counts up to a value once `go` turns true (instant with reduced motion). */
 function CountUp({ to, digits, go, prefix = "" }: { to: number | null; digits: number; go: boolean; prefix?: string }) {
@@ -33,43 +34,46 @@ function CountUp({ to, digits, go, prefix = "" }: { to: number | null; digits: n
 }
 
 export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Benchmarks | null; onTab: (t: Tab) => void; onTour: () => void }) {
-  const [shot, setShot] = useState<ProcessResponse | null>(null);
+  const [hero, setHero] = useState<HeroData | null>(null);
   const [counted, setCounted] = useState(false);
-  const first = lab.samples?.[0];
+  const stop = useRef(0); // the dial's stop, read on click only (state here would re-render the whole page per stop)
+  const warmed = useRef(false);
 
-  // the hero wants the night shot (3 stops under) — dramatic, and the tour reuses it from the server cache.
-  // The as-captured shot is precomputed; if the night one isn't back within 5 s, use that instead.
+  // the hero is static (precomputed by scripts/make_hero_assets.py), so it never waits on a cold server
+  useEffect(() => { loadHero().then(setHero).catch(() => undefined); }, []);
+  const sample = lab.samples?.find((s) => s.id === hero?.sample) ?? lab.samples?.[0];
+
+  // once the hero has played, have the server compute the tour's night shot in the background
   useEffect(() => {
-    if (!first) return;
-    const c = new AbortController();
-    let settled = false;
-    const use = (r: ProcessResponse) => {
-      if (settled) return;
-      settled = true;
-      preload([r.input.image_url, r.outputs.traditional.image_url, r.outputs.hybrid.image_url])
-        .then(() => { if (!c.signal.aborted) setShot(r); });
-    };
-    const captured = processImage({ sampleId: first.id, sim: first.preset, route: "auto", signal: c.signal });
-    captured.catch(() => undefined);
-    processImage({ sampleId: first.id, sim: NIGHT, route: "auto", signal: c.signal })
-      .then(use)
-      .catch(() => captured.then(use).catch(() => undefined));
-    const t = setTimeout(() => captured.then(use).catch(() => undefined), NIGHT_WAIT_MS);
-    return () => { settled = true; clearTimeout(t); c.abort(); };
-  }, [first?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!counted || !sample || warmed.current) return;
+    warmed.current = true;
+    processImage({ sampleId: sample.id, sim: NIGHT, route: "auto" }).catch(() => undefined);
+  }, [counted, sample]);
+
+  // the same RAW at the dial's light level, run live by the server
+  const runLive = (k: number) => {
+    if (!sample) { onTab("lab"); return; }
+    lab.setRoute("auto");
+    lab.pickSample(sample, { noise: 0, exposure_ev: -k, wb_shift: 0 });
+    onTab("lab");
+  };
 
   const h = headline(bench);
   const under = bench?.robustness?.find((r) => /expos/i.test(r.title));
-  const camera = first?.name.split(" · ").slice(0, 2).join(" · ") ?? "Real phone RAW";
-  const dark = shot ? shot.simulate.exposure_ev < -0.1 : true;
-  const caption = `${camera} · ${dark ? `${Math.abs(shot?.simulate.exposure_ev ?? 3)} stops under-exposed` : "low light"} · real RAW, unseen in training`;
-  const captionShort = `${camera.split(" · ")[0]} · ${dark ? `${Math.abs(shot?.simulate.exposure_ev ?? 3)} stops under` : "low light"} · real RAW`;
+  const last = hero ? hero.levels.length - 1 : 4;
+  const hyLast = hero?.metrics.hybrid[last]?.psnr;
+  const lead = (
+    <>
+      One real <Term k="raw">RAW</Term>, three pipelines. Take the light away: camera maths alone and a network alone both fall apart,
+      while the hybrid still scores <b>{fixed(hyLast, 1)}&nbsp;dB</b> with {lessLight(last)}.
+    </>
+  );
 
   const stats = (
     <div className="hero-stats" aria-label="Headline results on the test set">
       <div className="hstat">
         <span className="hstat-n num accent"><CountUp to={h.dPsnr} digits={1} go={counted} prefix="+" /><small>dB</small></span>
-        <span className="hstat-l">cleaner than a traditional pipeline (<Term k="psnr">PSNR</Term>, {h.n ?? 26} unseen images)</span>
+        <span className="hstat-l">cleaner than a traditional pipeline <span style={{ whiteSpace: "nowrap" }}>(<Term k="psnr">PSNR</Term>,</span> {h.n ?? 26} unseen images)</span>
       </div>
       <div className="hstat">
         <span className="hstat-n num">{fixed(h.deFrom, 1)}<i>→</i><CountUp to={h.deTo} digits={1} go={counted} /></span>
@@ -85,30 +89,36 @@ export function Overview({ lab, bench, onTab, onTour }: { lab: Lab; bench: Bench
   return (
     <main className="overview" id="main">
       <section className="hero" aria-labelledby="ov-h">
-        <HeroSweep shot={shot} caption={caption} captionShort={captionShort} onDone={() => setCounted(true)}>
-          <div className="hero-copy">
-            <p className="eyebrow">Computer Vision Hackathon 2026 · Problem P2</p>
-            <h1 id="ov-h">Camera maths where it’s exact. <span>A network where it isn’t.</span></h1>
-            <p className="lead hero-lead">
-              A hybrid smartphone <Term k="isp">camera pipeline</Term>: exact classical maths, a 1M-parameter network for the noise,
-              and a <Term k="router">router</Term> that decides how much network each photo needs.
-            </p>
-            <div className="ov-ctas">
-              <button className="btn primary large" onClick={onTour}>
-                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3v10l8-5z" fill="currentColor" /></svg>
-                Start the guided demo
-              </button>
-              <button className="btn large ghost hero-second" onClick={() => onTab("lab")}>Try your own photo</button>
+        <HeroLight
+          hero={hero}
+          onDone={() => setCounted(true)}
+          onStop={(k) => { stop.current = k; }}
+          onRunLive={runLive}
+          copy={
+            <div className="hero-copy">
+              <p className="eyebrow">Computer Vision Hackathon 2026 · Problem P2</p>
+              <h1 id="ov-h">Camera maths where it’s exact. <span>A network where it isn’t.</span></h1>
+              <p className="lead hero-lead">{lead}</p>
+              <div className="ov-ctas">
+                <button className="btn primary large" onClick={onTour}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 3v10l8-5z" fill="currentColor" /></svg>
+                  Start the guided demo
+                </button>
+                <button className="btn large ghost hero-second" onClick={() => onTab("lab")}>Try your own photo</button>
+              </div>
             </div>
-          </div>
-          <div className="hero-stats-wrap wide-only">{stats}</div>
-        </HeroSweep>
+          }
+        />
         <div className="hero-below">
-          <p className="lead">
-            A hybrid smartphone <Term k="isp">camera pipeline</Term>: exact classical maths, a 1M-parameter network for the noise,
-            and a <Term k="router">router</Term> that decides how much network each photo needs.
+          <p className="lead hb-only">{lead}</p>
+          <div className="ov-ctas hb-only">
+            <button className="btn large" onClick={() => runLive(stop.current)}>Run this photo live</button>
+            <button className="btn large" onClick={() => onTab("lab")}>Try your own photo</button>
+          </div>
+          <p className="hb-cap hb-only">
+            {hero ? `${hero.camera} · ISO ${hero.iso} · real RAW from the ${hero.dataset?.split(" (")[0] ?? "test"} test split, never seen in training. ` : ""}
+            Dragging uses precomputed results from this same pipeline; “Run this photo live” runs it on the server.
           </p>
-          <button className="btn large" onClick={() => onTab("lab")}>Try your own photo</button>
           {stats}
         </div>
       </section>

@@ -1,0 +1,120 @@
+{
+ "sample": "sidd-n6-iso3200-lowlight",
+ "name": "Nexus 6 · ISO 3200 · low light",
+ "camera": "Nexus 6",
+ "iso": 3200,
+ "dataset": "SIDD-CC (Abdelhamed et al., CVPR 2018)",
+ "split": "test (unseen)",
+ "levels": [
+  0.0,
+  -1.0,
+  -2.0,
+  -3.0,
+  -4.0
+ ],
+ "metrics": {
+  "traditional": [
+   {
+    "psnr": 17.844,
+    "ssim": 0.18,
+    "delta_e": 14.748
+   },
+   {
+    "psnr": 18.004,
+    "ssim": 0.253,
+    "delta_e": 14.745
+   },
+   {
+    "psnr": 15.182,
+    "ssim": 0.272,
+    "delta_e": 16.633
+   },
+   {
+    "psnr": 13.275,
+    "ssim": 0.239,
+    "delta_e": 18.179
+   },
+   {
+    "psnr": 12.175,
+    "ssim": 0.192,
+    "delta_e": 19.22
+   }
+  ],
+  "learned": [
+   {
+    "psnr": 24.716,
+    "ssim": 0.477,
+    "delta_e": 9.477
+   },
+   {
+    "psnr": 19.661,
+    "ssim": 0.515,
+    "delta_e": 11.473
+   },
+   {
+    "psnr": 15.413,
+    "ssim": 0.38,
+    "delta_e": 15.26
+   },
+   {
+    "psnr": 13.299,
+    "ssim": 0.246,
+    "delta_e": 17.687
+   },
+   {
+    "psnr": 12.162,
+    "ssim": 0.171,
+    "delta_e": 19.073
+   }
+  ],
+  "hybrid": [
+   {
+    "psnr": 25.283,
+    "ssim": 0.454,
+    "delta_e": 7.924
+   },
+   {
+    "psnr": 25.502,
+    "ssim": 0.472,
+    "delta_e": 7.846
+   },
+   {
+    "psnr": 25.59,
+    "ssim": 0.479,
+    "delta_e": 7.816
+   },
+   {
+    "psnr": 25.6,
+    "ssim": 0.476,
+    "delta_e": 7.785
+   },
+   {
+    "psnr": 25.418,
+    "ssim": 0.448,
+    "delta_e": 7.743
+   }
+  ]
+ },
+ "route": [
+  "learned_chroma",
+  "learned_chroma",
+  "learned_chroma",
+  "learned_chroma",
+  "learned_chroma"
+ ],
+ "size": {
+  "d": [
+   1536,
+   1024
+  ],
+  "m": [
+   768,
+   1024
+  ]
+ },
+ "model": {
+  "name": "LightweightISPUNet (SIDD-CC RAW denoiser)",
+  "params": 1004996
+ },
+ "generated": "2026-11-20"
+}
