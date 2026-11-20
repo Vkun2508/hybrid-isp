@@ -249,3 +249,8 @@
 @media (max-width: 999px) {
   .topbar .demo-btn { height: 36px; padding: 0 14px; font-size: 14px; min-height: 0; }
 }
+
+/* results that belong to the previous input recede while the new one runs (or after it failed) */
+.step.stale .verdict, .step.stale .route, .step.stale .pipe, .step.stale .loupe-wrap { opacity: 0.4; transition: opacity var(--dur) var(--ease-out); }
+.now { grid-template-columns: minmax(0, 1fr); }
+.now b, .now p { overflow-wrap: anywhere; }

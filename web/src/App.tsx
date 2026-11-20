@@ -25,6 +25,7 @@ export default function App() {
     history.replaceState(null, "", t === "overview" ? location.pathname : `#${t}`);
     const apply = () => {
       setTab(t);
+      if (t !== "lab") setTour(false); // the tour points at Lab elements; leaving the Lab ends it
       if (!opts?.keepScroll) window.scrollTo({ top: 0 });
     };
     const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };

@@ -49,6 +49,9 @@ export interface Benchmarks {
   message?: string;
   updated?: string;
   model?: { name: string; params: number; variant: string };
+  machine?: string;
+  extra?: { latency_ms_per_image?: Record<string, number>; peak_rss_mb?: number; raw_domain_psnr?: Record<string, number> };
+  per_image?: Record<string, unknown>[];
   dataset?: { name: string; test_scenes: string[]; n_images: number; note?: string };
   quality?: { pipeline: string; psnr: number; ssim: number; delta_e: number; lpips?: number | null }[];
   efficiency?: { variant: string; params: number; size_mb: number; latency_ms_1mp: number; peak_mem_mb?: number | null; raw_psnr_db?: number | null }[];

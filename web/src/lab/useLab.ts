@@ -21,6 +21,7 @@ export function useLab() {
   const [sim, setSim] = useState<SimPreset>(ZERO);
   const [route, setRoute] = useState<RouteMode>("auto");
   const [result, setResult] = useState<ProcessResponse | null>(null);
+  const [resultSource, setResultSource] = useState<Source | null>(null); // which input the shown result belongs to
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [startedAt, setStartedAt] = useState(0);
@@ -61,6 +62,7 @@ export function useLab() {
       .then((r) => {
         if (c.signal.aborted) return;
         setResult(r);
+        setResultSource(src);
         setModel(r.model);
       })
       .catch((e) => {
@@ -105,13 +107,16 @@ export function useLab() {
     setSim(ZERO);
   }, []);
   const retry = useCallback(() => { if (source) run(source, sim, route); }, [source, sim, route, run]);
+  const backToSamples = useCallback(() => { if (samples?.length) { setSource({ kind: "sample", sample: samples[0] }); setSim(samples[0].preset); } }, [samples]);
 
   const preset = source?.kind === "sample" ? source.sample.preset : ZERO;
   return {
     model, samples, source, sim, route, result, busy, error, preset,
     elapsed: busy ? Math.max(0, now - startedAt) : 0,
+    /** the result on screen is for an older input (still processing, or the new one failed) */
+    stale: !!result && (busy || resultSource !== source),
     pair, split, lens, zoom,
-    setSim, setRoute, setPair, setSplit, setLens, setZoom, pickSample, pickFile, retry,
+    setSim, setRoute, setPair, setSplit, setLens, setZoom, pickSample, pickFile, retry, backToSamples,
   };
 }
 

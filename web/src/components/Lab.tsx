@@ -17,9 +17,9 @@ export function useMedia(q: string) {
   return m;
 }
 
-function Step({ n, id, title, sub, children }: { n: number; id: string; title: ReactNode; sub: ReactNode; children: ReactNode }) {
+function Step({ n, id, title, sub, children, stale }: { n: number; id: string; title: ReactNode; sub: ReactNode; children: ReactNode; stale?: boolean }) {
   return (
-    <section className="step card" id={id} aria-labelledby={`${id}-h`}>
+    <section className={"step card" + (stale ? " stale" : "")} aria-busy={stale || undefined} id={id} aria-labelledby={`${id}-h`}>
       <div className="step-head">
         <span className="step-n" aria-hidden="true">{n}</span>
         <h2 id={`${id}-h`}>{title}</h2>
@@ -51,7 +51,7 @@ export function LabView({ lab, onTour }: { lab: Lab; onTour: () => void }) {
 
       <div className="lab-stage">
         <CompareViewer
-          result={result} busy={lab.busy} elapsed={lab.elapsed} error={lab.error} onRetry={lab.retry}
+          result={result} busy={lab.busy} elapsed={lab.elapsed} error={lab.error} onRetry={lab.retry} onReset={lab.backToSamples}
           pair={lab.pair} onPair={lab.setPair} split={lab.split} onSplit={lab.setSplit}
           lens={lab.lens} onLens={lab.setLens} tile={tile} zoom={lab.zoom}
         />
@@ -70,7 +70,7 @@ export function LabView({ lab, onTour }: { lab: Lab; onTour: () => void }) {
           {name && (
             <div className="now">
               <p><span className="muted">Now showing</span> <b>{name}</b></p>
-              {result && result.input.notes.map((n, i) => <p key={i} className="small muted">{n}</p>)}
+              {result && !lab.stale && result.input.notes.map((n, i) => <p key={i} className="small muted">{n}</p>)}
             </div>
           )}
         </Step>
@@ -79,17 +79,17 @@ export function LabView({ lab, onTour }: { lab: Lab; onTour: () => void }) {
           <Simulator sim={lab.sim} preset={lab.preset} onSim={lab.setSim} />
         </Step>
 
-        <Step n={3} id="step-verdict" title="Who wins" sub={<>Scored against the clean <Term k="gt">ground truth</Term> of the same scene.</>}>
+        <Step n={3} id="step-verdict" stale={lab.stale} title="Who wins" sub={result && !result.input.has_gt ? "Your own photo has no clean reference, so there are no scores: compare by eye." : <>Scored against the clean <Term k="gt">ground truth</Term> of the same scene.</>}>
           <Verdict r={result} />
           {!wide && loupe}
         </Step>
 
-        <Step n={4} id="step-route" title="Why this route" sub={<>What the <Term k="router">router</Term> measured on this RAW, and the path it chose.</>}>
+        <Step n={4} id="step-route" stale={lab.stale} title="Why this route" sub={<>What the <Term k="router">router</Term> measured on this RAW, and the path it chose.</>}>
           <RouteCard r={result} />
           <RouterControl mode={lab.route} onMode={lab.setRoute} />
         </Step>
 
-        <Step n={5} id="step-inside" title="Inside the pipeline" sub="Every stage's output and its time, from the sensor mosaic to the photo.">
+        <Step n={5} id="step-inside" stale={lab.stale} title="Inside the pipeline" sub="Every stage's output and its time, from the sensor mosaic to the photo.">
           <PipelineStrip r={result} />
         </Step>
       </div>

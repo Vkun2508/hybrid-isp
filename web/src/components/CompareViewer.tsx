@@ -23,6 +23,7 @@ interface Props {
   elapsed: number;
   error: ApiError | null;
   onRetry: () => void;
+  onReset: () => void;
   pair: Pair;
   onPair: (p: Pair) => void;
   split: number;
@@ -34,7 +35,7 @@ interface Props {
   zoom: Zoom;
 }
 
-export function CompareViewer({ result, busy, elapsed, error, onRetry, pair, onPair, split, onSplit, lens, onLens, tile, zoom }: Props) {
+export function CompareViewer({ result, busy, elapsed, error, onRetry, onReset, pair, onPair, split, onSplit, lens, onLens, tile, zoom }: Props) {
   const [custom, setCustom] = useState(false);
   const [boxW, setBoxW] = useState(800);
   const areaRef = useRef<HTMLDivElement>(null);
@@ -142,7 +143,11 @@ export function CompareViewer({ result, busy, elapsed, error, onRetry, pair, onP
               <span className="err-mark" aria-hidden="true">!</span>
               <strong>{error.message}</strong>
               {error.hint && <span className="secondary">{error.hint}</span>}
-              <button className="btn" onClick={onRetry} style={{ marginTop: 8 }}>Try again</button>
+              {error.status >= 400 && error.status < 500 ? (
+                <button className="btn" onClick={onReset} style={{ marginTop: 8 }}>Back to the sample photos</button>
+              ) : (
+                <button className="btn" onClick={onRetry} style={{ marginTop: 8 }}>Try again</button>
+              )}
             </div>
           </div>
         )}
