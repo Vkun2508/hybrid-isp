@@ -40,3 +40,19 @@
   body:has(.tour-sheet) { padding-bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + 220px); }
 }
 .loupe.tour-ring { border-radius: var(--radius-small); }
+
+/* swipe-to-dismiss grabber (phones only) and the keyboard hint (laptops only) */
+.tour-sheet { transition: transform var(--dur) var(--ease-drawer), opacity var(--dur) var(--ease-out); }
+.tour-sheet.dragging { transition: none; }
+.tour-grab { display: none; }
+.tour-keys { display: none; font-size: 12px; color: var(--muted); margin-left: auto; margin-right: 4px; white-space: nowrap; }
+.tour-keys kbd { font: 500 11px var(--mono); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--control); color: var(--secondary); margin-right: 2px; }
+@media (pointer: fine) and (min-width: 1000px) { .tour-keys { display: inline; } }
+@media (max-width: 999px) {
+  .tour-grab { display: grid; place-items: center; height: 20px; margin: -8px -14px -2px; touch-action: none; cursor: grab; }
+  .tour-grab span { width: 40px; height: 4px; border-radius: 2px; background: var(--control); }
+}
+@media (pointer: coarse) {
+  .tour-x { width: 44px; height: 44px; margin: -6px -6px -6px 0; }
+  .dev-ticks button { padding: 20px 0; }
+}

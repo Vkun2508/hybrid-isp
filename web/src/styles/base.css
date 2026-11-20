@@ -236,3 +236,6 @@ footer.foot p + p { margin-top: 4px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0ms !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* continuous corners on the new surfaces too (Chromium draws them; others keep the plain radius) */
+.film-img, .dev-frame, .stat, .tour-sheet, .pnode, .vtrack, .hb-track, .ev-gallery img, .term-pop { corner-shape: squircle; }

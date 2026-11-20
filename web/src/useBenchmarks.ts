@@ -19,7 +19,8 @@ export function useBenchmarks() {
   useEffect(() => {
     load();
     window.addEventListener("focus", load);
-    return () => window.removeEventListener("focus", load);
+    window.addEventListener("online", load);
+    return () => { window.removeEventListener("focus", load); window.removeEventListener("online", load); };
   }, [load]);
   return { b, err, reload: load };
 }

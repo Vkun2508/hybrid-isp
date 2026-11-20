@@ -29,7 +29,8 @@ short_description: Classical + learned smartphone camera ISP, compared live
 
 ALLOW = [
     "Dockerfile", ".dockerignore", "requirements.txt",
-    "isp/**", "server/**", "models/**", "samples/**", "results/**",
+    # models/: only the runtime files (never whatever else happens to sit in the folder locally)
+    "isp/**", "server/**", "models/*.onnx", "models/model.json", "models/README.md", "samples/**", "results/**",
     "web/package.json", "web/package-lock.json", "web/index.html", "web/vite.config.ts", "web/tsconfig.json",
     "web/public/**", "web/src/**",
 ]

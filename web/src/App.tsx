@@ -22,7 +22,9 @@ export default function App() {
   const bench = useBenchmarks();
 
   const changeTab = useCallback((t: Tab, opts?: { keepScroll?: boolean }) => {
-    history.replaceState(null, "", t === "overview" ? location.pathname : `#${t}`);
+    // push, so the phone's back button returns to the previous view instead of leaving the site
+    const url = t === "overview" ? location.pathname : `#${t}`;
+    if (fromHash().tab !== t || location.hash === "#tour") history.pushState(null, "", url);
     const apply = () => {
       setTab(t);
       if (t !== "lab") setTour(false); // the tour points at Lab elements; leaving the Lab ends it
@@ -35,9 +37,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const on = () => { const h = fromHash(); setTab(h.tab); if (h.tour) setTour(true); };
+    const on = () => {
+      const h = fromHash();
+      setTab(h.tab);
+      if (h.tour) setTour(true);
+      else if (h.tab !== "lab") setTour(false);
+    };
     window.addEventListener("hashchange", on);
-    return () => window.removeEventListener("hashchange", on);
+    window.addEventListener("popstate", on);
+    return () => { window.removeEventListener("hashchange", on); window.removeEventListener("popstate", on); };
   }, []);
 
   const startTour = () => { if (tab !== "lab") changeTab("lab"); setTour(true); };

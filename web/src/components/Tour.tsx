@@ -88,6 +88,8 @@ export function Tour({ lab, bench, onExit, onEvidence }: { lab: Lab; bench: Benc
   const [waiting, setWaiting] = useState(false);
   const sawBusy = useRef(false);
   const sheet = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ y: number; t: number } | null>(null);
+  const [dy, setDy] = useState(0);
   const step = STEPS[i];
   const ready = !!lab.samples;
 
@@ -147,7 +149,23 @@ export function Tour({ lab, bench, onExit, onEvidence }: { lab: Lab; bench: Benc
 
   const last = i === STEPS.length - 1;
   return (
-    <div className="tour-sheet" role="dialog" aria-modal="false" aria-labelledby="tour-title" ref={sheet} tabIndex={-1}>
+    <div
+      className={"tour-sheet" + (drag.current ? " dragging" : "")} role="dialog" aria-modal="false" aria-labelledby="tour-title" ref={sheet} tabIndex={-1}
+      style={dy ? { transform: `translateY(${dy}px)`, opacity: Math.max(0.3, 1 - dy / 240) } : undefined}
+    >
+      {/* swipe down on the grabber (phones) to close; the X stays for everyone else */}
+      <div
+        className="tour-grab" aria-hidden="true"
+        onPointerDown={(e) => { drag.current = { y: e.clientY, t: performance.now() }; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); }}
+        onPointerMove={(e) => { if (drag.current) setDy(Math.max(0, e.clientY - drag.current.y)); }}
+        onPointerUp={(e) => {
+          const d = drag.current; drag.current = null;
+          if (!d) return;
+          const dist = e.clientY - d.y, v = dist / Math.max(1, performance.now() - d.t);
+          if (dist > 90 || v > 0.6) onExit(); else setDy(0);
+        }}
+        onPointerCancel={() => { drag.current = null; setDy(0); }}
+      ><span /></div>
       <div className="tour-top">
         <span className="tour-count num">{i + 1} / {STEPS.length}</span>
         <span className="tour-dots" aria-hidden="true">
@@ -164,6 +182,7 @@ export function Tour({ lab, bench, onExit, onEvidence }: { lab: Lab; bench: Benc
       </p>
       <div className="tour-actions">
         {i > 0 ? <button className="btn text" onClick={() => setI(i - 1)}>Back</button> : <span />}
+        <span className="tour-keys" aria-hidden="true"><kbd>←</kbd><kbd>→</kbd> to step · <kbd>Esc</kbd> to close</span>
         {last ? (
           <span className="tour-end">
             <button className="btn" onClick={onExit}>Stay in the lab</button>
